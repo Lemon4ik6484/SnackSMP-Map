@@ -16,3 +16,37 @@
     display: none;
     opacity: 0;
 }
+
+.station .leaflet-popup-content-wrapper{
+    background-color: #454c84;
+    border: 6px solid #363b66;
+}
+
+.station .leaflet-popup-content {
+    color: white;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.station .leaflet-popup-close-button {
+    color: white !important;
+    margin: 3px;
+}
+
+.station .leaflet-popup-tip {
+    background-color: #454c84;
+    display: none;
+}
+
+.attribution-agency {
+    font-family: "Chakra Petch", sans-serif;
+    font-weight: 600;
+}
+
+.agency-icon {
+    position: relative;
+    top: 2px;
+}
