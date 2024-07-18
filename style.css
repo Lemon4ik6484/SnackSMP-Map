@@ -17,6 +17,27 @@
     opacity: 0;
 }
 
+.attribution-agency {
+    font-family: "Chakra Petch", sans-serif;
+    font-weight: 600;
+}
+
+.agency-icon {
+    position: relative;
+    top: 2px;
+}
+
+.gray {
+    color: #b4b9dd;
+}
+
+.horizontal {
+    display: flex;
+    justify-content: center;
+}
+
+/* STATION STYLE */
+
 .station .leaflet-popup-content-wrapper{
     background-color: #454c84;
     border: 6px solid #363b66;
@@ -32,21 +53,163 @@
 }
 
 .station .leaflet-popup-close-button {
-    color: white !important;
+    color: #d1d6ff !important;
     margin: 3px;
 }
 
 .station .leaflet-popup-tip {
-    background-color: #454c84;
     display: none;
 }
 
-.attribution-agency {
-    font-family: "Chakra Petch", sans-serif;
-    font-weight: 600;
+.station-title {
+    margin: 0 !important;
+    font-family: "Noto Sans", sans-serif;
+    font-weight: 700;
+    font-size: large;
 }
 
-.agency-icon {
-    position: relative;
-    top: 2px;
+.station-lines {
+    font-family: "Noto Sans", sans-serif;
+    margin: 0 !important;
+}
+
+.station-logo {
+    margin: 4px;
+    margin-top: 1px;
+}
+
+/* MEMORIAL STYLE */
+
+.memorial .leaflet-popup-content-wrapper{
+    background-color: #d27f50;
+    border: 6px solid #bf6939;
+}
+
+.memorial .leaflet-popup-content {
+    color: white;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.memorial .leaflet-popup-close-button {
+    color: #ffe2d1 !important;
+    margin: 3px;
+}
+
+.memorial .leaflet-popup-tip {
+    display: none;
+}
+
+/* BASE STYLE */
+
+.base .leaflet-popup-content-wrapper{
+    background-color: #45845e;
+    border: 6px solid #36714d;
+}
+
+.base .leaflet-popup-content {
+    color: white;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.base .leaflet-popup-close-button {
+    color: #d3ffe5 !important;
+    margin: 3px;
+}
+
+.base .leaflet-popup-tip {
+    display: none;
+}
+
+/* OCEAN STYLE */
+
+.ocean .leaflet-popup-content-wrapper{
+    background-color: #456284;
+    border: 6px solid #395474;
+}
+
+.ocean .leaflet-popup-content {
+    color: white;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.ocean .leaflet-popup-close-button {
+    color: #dcecff !important;
+    margin: 3px;
+}
+
+.ocean .leaflet-popup-tip {
+    display: none;
+}
+
+/* OTHER STYLE */
+
+.other .leaflet-popup-content-wrapper{
+    background-color: #cf7474;
+    border: 6px solid #b05858;
+}
+
+.other .leaflet-popup-content {
+    color: white;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.other .leaflet-popup-close-button {
+    color: #eebbbb !important;
+    margin: 3px;
+}
+
+.other .leaflet-popup-tip {
+    display: none;
+}
+
+/* TERRAIN STYLE */
+
+.terrain .leaflet-popup-content-wrapper{
+    background-color: #3aba6d;
+    border: 6px solid #1e9b50;
+}
+
+.terrain .leaflet-popup-content {
+    color: white;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.terrain .leaflet-popup-close-button {
+    color: #cbffe0 !important;
+    margin: 3px;
+}
+
+.terrain .leaflet-popup-tip {
+    display: none;
+}
+
+/* ------ */
+
+.leaflet-popup-content {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    flex-direction: column !important;
+    font-family: "Noto Sans", sans-serif;
+    font-weight: 600;
 }

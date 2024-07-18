@@ -2,6 +2,51 @@ let defaultZoom = 1
 
 document.addEventListener('DOMContentLoaded', function() {
 
+    function saveMapBounds() {
+        const currentBounds = map.getBounds()
+
+        var _southWestlat = currentBounds['_southWest'].lat
+        var _southWestlng = currentBounds['_southWest'].lng
+
+        var _northEastlat = currentBounds['_northEast'].lat
+        var _northEastlng = currentBounds['_northEast'].lng
+
+        localStorage.setItem("_southWestlat", _southWestlat);
+        localStorage.setItem("_southWestlng", _southWestlng);
+        localStorage.setItem("_northEastlat", _northEastlat);
+        localStorage.setItem("_northEastlng", _northEastlng);
+    }
+
+    function loadMapBounds() {
+        var _southWestlat = localStorage.getItem("_southWestlat");
+        var _southWestlng = localStorage.getItem("_southWestlng");
+        var _northEastlat = localStorage.getItem("_northEastlat");
+        var _northEastlng = localStorage.getItem("_northEastlng");
+
+        var _southWest = L.latLng(_southWestlat, _southWestlng);
+        var _northEast = L.latLng(_northEastlat, _northEastlng);
+
+        var boundsToLoad = L.latLngBounds(_southWest, _northEast);
+
+        if (Object.keys(boundsToLoad).length > 0) {
+            map.fitBounds(boundsToLoad);
+            mapRedraw();
+        } else {
+            saveMapBounds();
+        }
+        
+    }
+
+    function loadLayers() {
+        Groups.forEach(item => {
+            if (localStorage.getItem(item.name) === "true") {
+                map.addLayer(item.group);
+            } else {
+                map.removeLayer(item.group);
+            }
+        });
+    }
+
     // Tiles //
 
     const Overworld = L.tileLayer('MapTiles/Overworld/{x},{y}.png', {
@@ -48,63 +93,181 @@ document.addEventListener('DOMContentLoaded', function() {
         iconUrl: './waypoints/base.png',
         iconSize: [32, 32],
         iconAnchor: [16, 16],
-        popupAnchor: [0, 0]
+        popupAnchor: [0, 40]
     });
 
     const baseSmall = L.icon({
         iconUrl: './waypoints/base_small.png',
-        iconSize: [16, 16],
-        iconAnchor: [8, 8],
-        popupAnchor: [0, 0]
+        iconSize: [12, 12],
+        iconAnchor: [6, 6],
+        popupAnchor: [0, 40]
     });
 
     const ocean = L.icon({
         iconUrl: './waypoints/ocean.png',
         iconSize: [32, 32],
         iconAnchor: [16, 16],
-        popupAnchor: [0, 0]
+        popupAnchor: [0, 40]
     });
 
     const oceanSmall = L.icon({
         iconUrl: './waypoints/ocean_small.png',
-        iconSize: [16, 16],
-        iconAnchor: [8, 8],
-        popupAnchor: [0, 0]
+        iconSize: [12, 12],
+        iconAnchor: [6, 6],
+        popupAnchor: [0, 40]
     });
 
     const memorial = L.icon({
         iconUrl: './waypoints/memorial.png',
         iconSize: [32, 32],
         iconAnchor: [16, 16],
-        popupAnchor: [0, 0]
+        popupAnchor: [0, 40]
     });
 
     const memorialSmall = L.icon({
         iconUrl: './waypoints/memorial_small.png',
-        iconSize: [16, 16],
-        iconAnchor: [8, 8],
-        popupAnchor: [0, 0]
+        iconSize: [12, 12],
+        iconAnchor: [6, 6],
+        popupAnchor: [0, 40]
     });
 
     const other = L.icon({
         iconUrl: './waypoints/other.png',
         iconSize: [32, 32],
         iconAnchor: [16, 16],
-        popupAnchor: [0, 0]
+        popupAnchor: [0, 40]
     });
 
     const otherSmall = L.icon({
         iconUrl: './waypoints/other_small.png',
-        iconSize: [16, 16],
-        iconAnchor: [8, 8],
-        popupAnchor: [0, 0]
+        iconSize: [12, 12],
+        iconAnchor: [6, 6],
+        popupAnchor: [0, 40]
     });
+
+    const terrain = L.icon({
+        iconUrl: './waypoints/terrain.png',
+        iconSize: [32, 32],
+        iconAnchor: [16, 16],
+        popupAnchor: [0, 40]
+    });
+
+    const terrainSmall = L.icon({
+        iconUrl: './waypoints/terrain_small.png',
+        iconSize: [12, 12],
+        iconAnchor: [6, 6],
+        popupAnchor: [0, 40]
+    });
+
+    // random popup function (veru important)
+
+    function popupStation(Logo, Name, Lines) {
+        return "<div class='horizontal'><img class='station-logo' style='height: 20px;' src='" + "./logos/" + Logo + ".png" + "'/><p class='station-title'>" + Name + "</p></div><div class='horizontal'><p class='station-lines gray'>Lines: </p><p class='station-lines'>" + Lines + "</p></div>"
+    }
 
     // WAYPOINTS //
 
-    const Central = L.marker([-3126.25, 2210.75], {icon: station}).bindPopup("Central Station<br><div>Owned by: <img style='height: 12px;' src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAABTCAYAAABXlA9KAAAD00lEQVR4nO3dQW7bRhQG4DeU5S7DGzQ9QXSDaBkUKOAjsAtShkxKTzfwDTQuhSCygYK9QXoDL4sCBeQbuKuuCkjbyOJkEaNBTckcIqYeOfy/pUxDA/HXzHA4fCICAAAAAACADlGH/sDjcECeOjtuczpCmXvqbT9qna2lm7IXx1FmoFaTOFrzOBxIn+sCjqNL6Q+nKyZxtGYOfMnz7RVeMQbd/pFcpctXtOuLft6FAMwX129kmtJRRr2WfPtCAGZxdCfTlI5S5l7y7YtDgFIfRVrSQdNktKHeVvTz7j194Y8//7rd/PvPD+9+/Kl5M1SHTJPRxsvNUKe/ivYADqwDKH+efpjaHDlNRhuPSNffphJNXwdoG07CwPbSi+ORfADg5VULwflQur1QA9sQcBxl0m2FmvBFxGUBmMQRxl6X2dzLYD4XXYCBmvFFuMI8oFxxIcgBPA4HuZJdYgUhPA4Hkzhalw0B0u2EGtiefL4IV9JtbQpnhgAeh4PcU7dX6fJV6cFeA1YD4eXYfvPx7S86eC+A/rsf0BPdsVIu93OizOqbT0SzSfQzmZ7MDZh8t9bvbxoVwL0B4Dg6IyI9T5ffH79J7pvF0R15pHV607wVSY7PhzZdKXw7jqPb5u0JVDsWaUkHzdPlW9r2RUNQGAIMrpGPbhZHd9TfDiX2BxR6gGky2hy7EV03X1y/keoJCgHwiLAnUIBUCIpzgJNPjF5AhkQI9l8GcuDTw3eXRAYbQ1/QPF2+tTluNol+1+lNC/ZjQiXVtq1h15KTEAJACMBu7yJC4LgqdRgQAkchBIAQAEIACAFQ9RBcSrcXalApBEkYSLcXaoAQAEIACEHnMQd+2YOuCIHjEAJACAAhgBpC4MzTwV2hdbam/nZoW9I3N0o3siw9fJsqPQGeiHZUpRAcuG+AIaDFqgwHORGe+XSVbU/w+Nj//6AHcIDW2ZoMBeVPdKlCaTwEwBH6/c3KU6akm8eTXs57bghAidwOKJsLPD0eQ4BjUCG1w8rqO3Ec3T79H/QALjG75wtgKlOYA5zU2R44DubAp10/m/9S+puPheovrQ0Ac+DT9jQgRQ0vZFm71/kDnVkVyhT+iboXw0kY2JaGhS8OPUjSujkAc+DnRmnb0rDwWPntxNt7M6h9Q8D2NLha4ORX4SnDWn/YWx+5fQHAmF/JLBn9pheHaxK3bgggQ1jOtDRLzq/04vrZLWHPlotvIubAzx9O7zEHOGyWjP4mItaL69JZf+sCQI9XAZgIFn3ZGKIy6n/KbOsOtzIAhHWAp1Z04q0OTfQAAAAAAAC++gzUEcTLpP4kFgAAAABJRU5ErkJggg==' alt='CR logo' />Central Rail</div>", {className:'station'});
+    // terrain
 
-    const L6Statue = L.marker([-3399, 2021.25], {icon: memorial}).bindPopup("First L6 Train<br>Statue")
+    const TellusIsland = L.marker([-2760, 2028], {icon:terrain}).bindPopup("Tellus Island", {className:'terrain'})
+
+    // oceans
+
+    const LukewarmBay = L.marker([-3353, 1833], {icon:ocean}).bindPopup("Lukewarm Bay", {className:'ocean'})
+
+    const lakeLycia = L.marker([-2603, 2171], {icon:ocean}).bindPopup("Lake Lycia", {className:'ocean'})
+
+    // memorials
+
+    const L6Statue = L.marker([-3399, 2021.25], {icon: memorial}).bindPopup("First L6 Train<br>Statue", {className:'memorial'})
+
+    const WompChurch = L.marker([-3273, 2195], {icon:memorial}).bindPopup("Church of Womp", {className:'memorial'})
+
+    // bases
+
+    const Mills = L.marker([-2879, 2588], {icon:base}).bindPopup("Mills", {className:'base'})
+
+    //big stations
+
+    const Central = L.marker([-3126.25, 2210.75], {icon: station}).bindPopup(popupStation("CR", "Central", "L1, L2, A, B, D"), {className:'station'});
+
+    const LyciaBridge = L.marker([-2629.125, 2141.5], {icon:station}).bindPopup(popupStation("CR","Lycia Bridge", "L1, R11, L21, A"), {className:'station'})
+
+    const JungletownTemple = L.marker([-3760.25, 1783.5], {icon:station}).bindPopup(popupStation("CR","Jungletown Temple", "L6, L8, R13, R14, D"), {className:'station'})
+
+    const Communista = L.marker([-3774.5, 2424.5], {icon:station}).bindPopup(popupStation("CR","Communista","R12, R13"), {className:'station'})
+
+    const Grimsbypeaks = L.marker([-4273.5, 2013.75], {icon:station}).bindPopup(popupStation("CR","Grimsby Peaks","R12, R13, R14"), {className:'station'})
+
+    const NeoArcania = L.marker([-1719.75, 2309.75], {icon:station}).bindPopup(popupStation("CR","Neo Arcania","R11, L22, A"), {className:'station'})
+
+    const Krunkeria = L.marker([-2642.125, 3442.25], {icon:station}).bindPopup(popupStation("CR","Krunkeria","B"), {className:'station'})
+
+    const NewIndustria = L.marker([-4719.5, 1008.25], {icon:station}).bindPopup(popupStation("CR","New Industria","R12"), {className:'station'})
+
+    const StaraWies = L.marker([-5045.875, 2228.875], {icon:station}).bindPopup(popupStation("CR","Stara Wieś","R14"), {className:'station'})
+
+    const Riverant = L.marker([-3374.5, 2094.25], {icon:station}).bindPopup(popupStation("CR","Riverant","L1, L6, L23, M31"), {className:'station'})
+
+    const Capitalistopia = L.marker([-2438, 1912.5], {icon:station}).bindPopup(popupStation("CR","Capitalistopia","L21"), {className:'station'})
+
+    const Dragonstone= L.marker([-3418.75, 2605.25], {icon:station}).bindPopup(popupStation("CR","Dragonstone","L2"), {className:'station'})
+
+    const Rublenika = L.marker([-1891, 2242], {icon:station}).bindPopup(popupStation("CR","Rublenika","R11"), {className:'station'})
+
+    //small stations
+    
+    const Blossomingvalley = L.marker([-2791.5, 2226], {icon:station}).bindPopup(popupStation("CR","Blossoming Valley","L1, L2"), {className:'station'})
+
+    const Cherryville = L.marker([-2969.375, 2263], {icon:station}).bindPopup(popupStation("CR","Cherryville","L2"), {className:'station'})
+
+    const Refinery = L.marker([-2756, 2169.625], {icon:station}).bindPopup(popupStation("CR","Refinery","L2"), {className:'station'})
+
+    const FortBoreas = L.marker([-2723.375, 2064.25], {icon:station}).bindPopup(popupStation("CR","Fort Boreas","L2"), {className:'station'})
+
+    const Hammerington = L.marker([-2807.625, 2051.875], {icon:station}).bindPopup(popupStation("CR","Hammerington","L2"), {className:'station'})
+
+    const LyciaNewport = L.marker([-2726.375, 2175.25], {icon:station}).bindPopup(popupStation("CR","Lycia Newport","L1"), {className:'station'})
+
+    const WompWomp = L.marker([-3263.75, 2180.5], {icon:station}).bindPopup(popupStation("CR","Womp Womp","L1"), {className:'station'})
+
+    const LycentPlateau = L.marker([-3147.25, 2316.5], {icon:station}).bindPopup(popupStation("CR","Lycent Plateau","L2"), {className:'station'})
+
+    const IsleofWheat = L.marker([-3241.75, 2428.75], {icon:station}).bindPopup(popupStation("CR","Isle of Wheat","L2"), {className:'station'})
+
+    const Timberland = L.marker([-3392, 1995.75], {icon:station}).bindPopup(popupStation("CR","Timberland","L6"), {className:'station'})
+
+    const MiddleseaBeach = L.marker([-3578, 1924.5], {icon:station}).bindPopup(popupStation("CR","Middlesea Beach","L6, L8"), {className:'station'})
+
+    const SouthernCross = L.marker([-3579, 2023.5], {icon:station}).bindPopup(popupStation("CR","Southern Cross","L8"), {className:'station'})
+
+    const Birchland = L.marker([-3536.5, 2109.5], {icon:station}).bindPopup(popupStation("CR","Birchland","L8"), {className:'station'})
+
+    const PortAndesworth = L.marker([-3633.5, 2160], {icon:station}).bindPopup(popupStation("CR","Port Andesworth","L8, L23"), {className:'station'})
+
+    const JungletownIndustrial = L.marker([-3649, 1790], {icon:station}).bindPopup(popupStation("CR","Jungletown Industrial","L6, L8"), {className:'station'})
+
+    const Atombeach= L.marker([-3238, 1913.75], {icon:station}).bindPopup(popupStation("CR","Atom Beach","L23"), {className:'station'})
+
+    const OldIndustria = L.marker([-3718, 2023.5], {icon:station}).bindPopup(popupStation("CR","Old Industria","M31"), {className:'station'})
+
+    const Rybnik = L.marker([-3934, 1756], {icon:station}).bindPopup(popupStation("CR","Rybnik","L8"), {className:'station'})
+
+    const EndPortal = L.marker([-4009, 1662.25], {icon:station}).bindPopup(popupStation("CR","End Portal","L8"), {className:'station'})
+
+    const mtOnk = L.marker([-4657, 1986], {icon:station}).bindPopup(popupStation("CR","Mt. Onk","R12"), {className:'station'})
+
+    const OakRidge = L.marker([4519, 2095], {icon:station}).bindPopup(popupStation("CR","Oakridge","R14"), {className:'station'})
+
+    const Cheeseland = L.marker([-4682, 2201], {icon:station}).bindPopup(popupStation("CR","Cheeseland","R14"), {className:'station'})
+
+    const HighlandEast = L.marker([-2434, 2228], {icon:station}).bindPopup(popupStation("CR","Highland East","R11"), {className:'station'})
+
+    const NorthernShores = L.marker([-1674, 2181], {icon:station}).bindPopup(popupStation("CR","Northern Shores","L22"), {className:'station'})
+
+    const GrimsbyHarbor = L.marker([-4085, 2032], {icon:station}).bindPopup(popupStation("CR","Grimsby Harbor","R13, R12"), {className:'station'})
+
+
 
     // ZONES //
 
@@ -165,7 +328,7 @@ document.addEventListener('DOMContentLoaded', function() {
         [-2641.25, 1510],
         [-2596.5, 1383.125],
         [-2412.75, 1478.875]
-    ], {color: '#D3FFCE', fillColor: '#065535'})//.bindPopup("Central Ocean");
+    ], {color: '#D3FFCE', fillColor: '#065535'}).bindPopup("Central Ocean", {className: 'ocean'});
 
     const Westbeach = L.polygon([
         [-3415.1875, 1774.125],
@@ -203,7 +366,7 @@ document.addEventListener('DOMContentLoaded', function() {
         [-3253.5, 1756],
         [-3334.5, 1742],
         [-3354.5, 1721.5]
-    ], {color: '#D3FFCE', fillColor: '#065535'})//.bindPopup("Westbeach");
+    ], {color: '#D3FFCE', fillColor: '#065535'}).bindPopup("Westbeach", {className:'terrain'});//
 
     const CentralPlains = L.polygon([
         [-2621.75, 1975],
@@ -224,7 +387,10 @@ document.addEventListener('DOMContentLoaded', function() {
         [-3262.25, 2372],
         [-3317.25, 2390.25],
         [-3389, 2369.25],
-        [-3333.25, 2186.25],
+        [-3304, 2311.5],
+        [-3297.5, 2252.875],
+        [-3333, 2219],
+        [-3333.1875, 2158],
         [-3320.125, 2140.125],
         [-3282.625, 2177.625],
         [-3248.75, 2175],
@@ -242,11 +408,13 @@ document.addEventListener('DOMContentLoaded', function() {
         [-2845.75, 1998.75],
         [-2730.250028, 1934.250215],
         [-2664.25, 1979.25]
-    ], {color: '#D3FFCE', fillColor: '#065535'})//.bindPopup("Central Plains");
+    ], {color: '#D3FFCE', fillColor: '#065535'}).bindPopup("Central Plains", {className:'terrain'});
 
     const Middlesea = L.polygon([
         [-3320.125, 2140.1875],
-        [-3388.9375, 2369.1875],
+        [-3333.375, 2157.875],
+        [-3333.0625, 2219],
+        [-3425.941827, 2347.236379],
         [-3584.5, 2309],
         [-3656, 2160.5],
         [-3605.25, 1996.25],
@@ -282,7 +450,7 @@ document.addEventListener('DOMContentLoaded', function() {
         [-3338.625, 2064.875],
         [-3315.375, 2087.625],
         [-3316.75, 2133.125]
-    ], {color: '#D3FFCE', fillColor: '#065535'})//.bindPopup("Middlesea");
+    ], {color: '#D3FFCE', fillColor: '#065535'}).bindPopup("Middlesea", {className:'terrain'});
     
     const Highlands = L.polygon([
         [-2540, 2233.125],
@@ -308,7 +476,207 @@ document.addEventListener('DOMContentLoaded', function() {
         [-2620.75, 2093.5],
         [-2570.5, 2081.8125],
         [-2539.4375, 2127.0625]
-    ], {color: '#D3FFCE', fillColor: '#065535'})//.bindPopup("Highlands");
+    ], {color: '#D3FFCE', fillColor: '#065535'}).bindPopup("Highlands", {className:'terrain'});//
+
+    const Heights = L.polygon([
+        [-2152.064792, 2233.500109],
+        [-2078, 2398],
+        [-2075.125, 2583.75],
+        [-2202.5, 2716],
+        [-2201.5, 2884],
+        [-2348.5, 2979],
+        [-2466, 3103.5],
+        [-2528, 3105.25],
+        [-2512.5, 2931.5],
+        [-2581.5, 2887],
+        [-2571, 2805.5],
+        [-2520.5, 2786.5],
+        [-2540, 2729],
+        [-2486, 2661],
+        [-2499, 2483],
+        [-2587, 2479],
+        [-2630, 2527.5],
+        [-2689.75, 2487.25],
+        [-2785.5, 2492],
+        [-2837.25, 2468.5],
+        [-2760.5, 2387.75],
+        [-2793.125, 2294.75],
+        [-2755.3125, 2247.5625],
+        [-2712.375, 2254.25],
+        [-2581.125, 2340.625],
+        [-2540, 2256.25],
+        [-2539.9375, 2233.1875]
+    ], {color: '#D3FFCE', fillColor: '#065535'}).bindPopup("Heights", {className:'terrain'});//
+
+    const SouthernOcean = L.polygon([
+        [-3813.5, 1811.5],
+        [-3860, 1769],
+        [-3943.5, 1791],
+        [-3978, 1787.5],
+        [-4029.25, 1824.75],
+        [-4090, 1837],
+        [-4150, 1837],
+        [-4165.5, 1856.375],
+        [-4069.75, 1935],
+        [-4059.25, 1979],
+        [-4087.875, 2004.125],
+        [-4065.125, 2029.625],
+        [-4015.999911, 2011.250021],
+        [-3986.25, 2036],
+        [-3989.625, 2095.375],
+        [-3872.5, 2059.5],
+        [-3830.125, 2129.25],
+        [-3777.75, 2170.5],
+        [-3801.5, 2220.5],
+        [-3848, 2262],
+        [-3887.25, 2264],
+        [-3922.625, 2313],
+        [-3914, 2328.125],
+        [-3823.25, 2325.5],
+        [-3733, 2247.5],
+        [-3634.5, 2293.25],
+        [-3606, 2330.75],
+        [-3592.25, 2462],
+        [-3656.25, 2476.75],
+        [-3676, 2525],
+        [-3674.25, 2569],
+        [-3645, 2573.5],
+        [-3621.125, 2627.875],
+        [-3651.5, 2648.5],
+        [-3632.25, 2670.5],
+        [-3596.75, 2651.75],
+        [-3549, 2664],
+        [-3496, 2651],
+        [-3437, 2594],
+        [-3443, 2491.75],
+        [-3389, 2369.25],
+        [-3304, 2311.5],
+        [-3297.5, 2252.875],
+        [-3333, 2219],
+        [-3333.0625, 2219], 
+        [-3425.941827, 2347.236379],
+        [-3584.5, 2309],
+        [-3656, 2160.5],
+        [-3605.25, 1996.25],
+        [-3688.5, 1874.5],
+        [-3741.5, 1866],
+        [-3813.5, 1811.5]
+    ], {color: '#D3FFCE', fillColor: '#065535'}).bindPopup("Southern Ocean", {className:'ocean'});//
+
+    const Woodsdale = L.polygon([
+        [-2729.5, 3259.5],
+        [-2528, 3105.25],
+        [-2512.5, 2931.5],
+        [-2581.5, 2887],
+        [-2571, 2805.5],
+        [-2520.5, 2786.5],
+        [-2540, 2729],
+        [-2486, 2661],
+        [-2499, 2483],
+        [-2587, 2479],
+        [-2630, 2527.5],
+        [-2689.75, 2487.25],
+        [-2785.5, 2492],
+        [-2837.25, 2468.375],
+        [-2837, 2468.5],
+        [-2869.25, 2408.5],
+        [-2984.25, 2411.75],
+        [-3081, 2368],
+        [-3202, 2368],
+        [-3262.25, 2372],
+        [-3317.25, 2390.25],
+        [-3389, 2369.25],
+        [-3389, 2369.25],
+        [-3443, 2491.75],
+        [-3437, 2594],
+        [-3496, 2651],
+        [-3519.125, 2656.75],
+        [-3461.5, 2934.375],
+        [-3475.25, 3038],
+        [-3519.5, 3047],
+        [-3533.75, 3223],
+        [-3396.75, 3208.75],
+        [-3284, 2861],
+        [-3171, 2806],
+        [-2936, 2905]
+    ], {color: '#D3FFCE', fillColor: '#065535'}).bindPopup("Woodsdale", {className:'terrain'});//
+
+    const PolarHills = L.polygon([
+        [-3396.75, 3208.75],
+        [-3284, 2861],
+        [-3171, 2806],
+        [-2936, 2905],
+        [-2729.5, 3259.5],
+        [-2718.5, 3339.25],
+        [-2723.75, 3378],
+        [-2793.75, 3492],
+        [-2897, 3582.5],
+        [-2998, 3788.5],
+        [-2889, 3864.5],
+        [-2996.25, 3963.75],
+        [-3091, 3987],
+        [-3316, 3981],
+        [-3574, 4081],
+        [-3667.5, 4003],
+        [-3768, 3775],
+        [-3740, 3678],
+        [-3580, 3629.5],
+        [-3514, 3573.5],
+        [-3453, 3422]
+    ], {color: '#D3FFCE', fillColor: '#065535'}).bindPopup("Polar Hills", {className:'terrain'});//
+
+    const Shoreden = L.polygon([
+        [-3719.25, 1633.5],
+        [-3814.25, 1617.5],
+        [-3853.75, 1576.75],
+        [-3874.5, 1517.5],
+        [-3880.75, 1409.25],
+        [-3947.25, 1362.75],
+        [-4030.5, 1364],
+        [-4125, 1398.5],
+        [-4207, 1407.5],
+        [-4257, 1438.25],
+        [-4300, 1510],
+        [-4436, 1514.5],
+        [-4423.5, 1662],
+        [-4246, 1842],
+        [-4353.5, 2035],
+        [-4146, 2291],
+        [-4141.75, 2353],
+        [-4063, 2416],
+        [-3922.625, 2313],
+        [-3914, 2328.125],
+        [-3823.25, 2325.5],
+        [-3733, 2247.5],
+        [-3634.5, 2293.25],
+        [-3606, 2330.75],
+        [-3592.25, 2462],
+        [-3656.25, 2476.75],
+        [-3676, 2525],
+        [-3674.25, 2569],
+        [-3645, 2573.5],
+        [-3621.125, 2627.875],
+        [-3651.5, 2648.5],
+        [-3632.25, 2670.5],
+        [-3596.75, 2651.75],
+        [-3549, 2664],
+        [-3496, 2651],
+        [-3437, 2594],
+        [-3443, 2491.75],
+        [-3389, 2369.25],
+        [-3304, 2311.5],
+        [-3297.5, 2252.875],
+        [-3333, 2219],
+        [-3333.0625, 2219], 
+        [-3425.941827, 2347.236379],
+        [-3584.5, 2309],
+        [-3656, 2160.5],
+        [-3605.25, 1996.25],
+        [-3688.5, 1874.5],
+        [-3741.5, 1866],
+        [-3813.5, 1811.5],
+        [-3788.375, 1736]
+    ], {color: '#D3FFCE', fillColor: '#065535'}).bindPopup("Shoreden", {className:'terrain'});//
 
     // LAYER CONTROL //
 
@@ -317,27 +685,119 @@ document.addEventListener('DOMContentLoaded', function() {
         Westbeach, 
         CentralPlains, 
         Middlesea, 
-        Highlands
+        Highlands,
+        Heights,
+        SouthernOcean,
+        Woodsdale,
+        PolarHills,
+        Shoreden
     ]
 
     const stations = [
         Central, 
+        LyciaBridge, 
+        JungletownTemple,
+        Communista,
+        Grimsbypeaks,
+        NeoArcania,
+        Krunkeria,
+        NewIndustria,
+        StaraWies,
+        Riverant,
+        Capitalistopia,
+        Dragonstone,
+        Rublenika,
+        Blossomingvalley,
+        Cherryville,
+        Refinery,
+        FortBoreas,
+        Hammerington,
+        LyciaNewport,
+        WompWomp,
+        LycentPlateau,
+        IsleofWheat,
+        Timberland,
+        MiddleseaBeach,
+        SouthernCross,
+        Birchland,
+        PortAndesworth,
+        JungletownIndustrial,
+        Atombeach,
+        OldIndustria,
+        Rybnik,
+        EndPortal,
+        mtOnk,
+        OakRidge,
+        Cheeseland,
+        HighlandEast,
+        NorthernShores,
+        GrimsbyHarbor
+    ]
+
+    const bigStations = [
+        Central,
+        LyciaBridge,
+        JungletownTemple,
+        Communista,
+        Grimsbypeaks,
+        NeoArcania,
+        Krunkeria,
+        NewIndustria,
+        StaraWies,
+        Riverant,
+        Capitalistopia,
+        Dragonstone,
+        Rublenika
+    ]
+
+    const smallStations = [
+        Blossomingvalley,
+        Cherryville,
+        Refinery,
+        FortBoreas,
+        Hammerington,
+        LyciaNewport,
+        WompWomp,
+        LycentPlateau,
+        IsleofWheat,
+        Timberland,
+        MiddleseaBeach,
+        SouthernCross,
+        Birchland,
+        PortAndesworth,
+        JungletownIndustrial,
+        Atombeach,
+        OldIndustria,
+        Rybnik,
+        EndPortal,
+        mtOnk,
+        OakRidge,
+        Cheeseland,
+        HighlandEast,
+        NorthernShores,
+        GrimsbyHarbor
     ]
 
     const memorials = [
-        L6Statue
+        L6Statue,
+        WompChurch
     ]
 
     const bases = [
-
+        Mills
     ]
 
     const oceans = [
-        
+        LukewarmBay,
+        lakeLycia
     ]
 
     const others = [
 
+    ]
+
+    const terrains = [
+        TellusIsland
     ]
 
     // please dont edit groups below, edit arrays abowe instead!
@@ -354,9 +814,21 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const othersGroup = L.layerGroup(others);
 
+    const terrainsGroup = L.layerGroup(terrains);
+
+    const Groups = [
+        { group: stationsGroup, name: 'stations' },
+        { group: regionsGroup, name: 'regions' },
+        { group: memorialsGroup, name: 'memorials' },
+        { group: basesGroup, name: 'bases' },
+        { group: oceansGroup, name: 'oceans' },
+        { group: othersGroup, name: 'others' },
+        { group: terrainsGroup, name: 'terrains' }
+    ];
+
     const map = L.map('map', {
         crs: L.CRS.Simple,
-        layers: [Overworld, regionsGroup]
+        layers: [Overworld, regionsGroup, stationsGroup]
     }).setView([-3150, 2250], defaultZoom);
 
     const Maps = {
@@ -371,14 +843,18 @@ document.addEventListener('DOMContentLoaded', function() {
         "Memorials": memorialsGroup,
         "Bases/Towns": basesGroup,
         "Bays/Lakes": oceansGroup,
+        "Terrain": terrainsGroup,
         "Other": othersGroup
     };
 
     const layerControl = L.control.layers(Maps, Waypoints).addTo(map);
 
-    // EVENTS //
+    loadMapBounds()
+    loadLayers()
 
-    map.on('zoom', function() {
+    // EVENTS/FUNCTIONS //
+
+    function mapRedraw() {
         const zoom = map.getZoom();
         Overworld.options.tileSize = (512 * Math.pow(2, zoom - defaultZoom)) * 2;
         Overworld.redraw();
@@ -388,19 +864,48 @@ document.addEventListener('DOMContentLoaded', function() {
 
         End.options.tileSize = (512 * Math.pow(2, zoom - defaultZoom)) * 2;
         End.redraw();
+    }
+
+    map.on('zoom', function() {
+        mapRedraw();
     });
 
     map.on('zoomend', function() {
         var zoomLevel = map.getZoom();
+
+        const reallySmallStationIcon = L.icon({
+            iconUrl: './waypoints/station_small.png',
+            iconSize: [12, 12], 
+            iconAnchor: [6, 6],
+            popupAnchor: [0, 40]
+        });
         
         if (zoomLevel < 1) {
-            stations.forEach(stationWP => stationWP.setIcon(stationSmall));
-            memorials.forEach(memorialWP => memorialWP.setIcon(memorialSmall));
+            stations.forEach(waypoint => waypoint.setIcon(stationSmall));
+            memorials.forEach(waypoint => waypoint.setIcon(memorialSmall));
+            bases.forEach(waypoint => waypoint.setIcon(baseSmall));
+            oceans.forEach(waypoint => waypoint.setIcon(oceanSmall));
+            terrains.forEach(waypoint => waypoint.setIcon(terrainSmall));
+            others.forEach(waypoint => waypoint.setIcon(otherSmall));
+
+            smallStations.forEach(waypoint => waypoint.setIcon(reallySmallStationIcon));
         } else {
-            stations.forEach(stationWP => stationWP.setIcon(station));
-            memorials.forEach(memorialWP => memorialWP.setIcon(memorial));
+            stations.forEach(waypoint => waypoint.setIcon(station));
+            memorials.forEach(waypoint => waypoint.setIcon(memorial));
+            bases.forEach(waypoint => waypoint.setIcon(base));
+            oceans.forEach(waypoint => waypoint.setIcon(ocean));
+            others.forEach(waypoint => waypoint.setIcon(other));
+            terrains.forEach(waypoint => waypoint.setIcon(terrain));
+
+            smallStations.forEach(waypoint => waypoint.setIcon(station));
         };
-    })
+
+        saveMapBounds()
+    });
+
+    map.on('moveend', function() {
+        saveMapBounds()
+    });
 
     const popup = L.popup();
 
@@ -408,7 +913,23 @@ document.addEventListener('DOMContentLoaded', function() {
         popup
             .setLatLng(e.latlng)
             .setContent(e.latlng.toString())
-            .openOn(map);
+            .openOn(map)
     });
 
+    document.addEventListener('keydown', function(e) {
+        if (e.key === "Backspace") {
+            map.closePopup();
+        }    
+    });
+
+
+    // Layer Groups Events
+
+    Groups.forEach(item => item.group.on('add', function(){
+        localStorage.setItem(item.name, true);
+    }));
+
+    Groups.forEach(item => item.group.on('remove', function(){
+        localStorage.setItem(item.name, false);
+    }));
 });
