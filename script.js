@@ -2,8 +2,13 @@ let defaultZoom = 1
 
 document.addEventListener('DOMContentLoaded', function() {
 
+    function getQueryParam(param) {
+        var urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(param);
+    }
+
     function saveMapBounds() {
-        const currentBounds = map.getBounds()
+        var currentBounds = map.getBounds()
 
         var _southWestlat = currentBounds['_southWest'].lat
         var _southWestlng = currentBounds['_southWest'].lng
@@ -49,7 +54,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Tiles //
 
-    const Overworld = L.tileLayer('MapTiles/Overworld/{x},{y}.png', {
+    var Overworld = L.tileLayer('MapTiles/Overworld/{x},{y}.png', {
         maxZoom: 4,
         minZoom: -2,
         tileSize: (512 * Math.pow(2, 0)) * 2,
@@ -57,7 +62,7 @@ document.addEventListener('DOMContentLoaded', function() {
         attribution: '<a class="attribution-agency" href="https://lemon4ik6484.github.io/Digital-Agency/" target="_blank"><img style="height: 12px;" class="agency-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAAEACAYAAABccqhmAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAFbmlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgOS4xLWMwMDIgNzkuZGJhM2RhMywgMjAyMy8xMi8xMy0wNTowNjo0OSAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczpkYz0iaHR0cDovL3B1cmwub3JnL2RjL2VsZW1lbnRzLzEuMS8iIHhtbG5zOnBob3Rvc2hvcD0iaHR0cDovL25zLmFkb2JlLmNvbS9waG90b3Nob3AvMS4wLyIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0RXZ0PSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VFdmVudCMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIDI1LjcgKFdpbmRvd3MpIiB4bXA6Q3JlYXRlRGF0ZT0iMjAyNC0wNy0xNVQxMjo0MzozNyswMjowMCIgeG1wOk1vZGlmeURhdGU9IjIwMjQtMDctMTVUMTI6NTA6MjErMDI6MDAiIHhtcDpNZXRhZGF0YURhdGU9IjIwMjQtMDctMTVUMTI6NTA6MjErMDI6MDAiIGRjOmZvcm1hdD0iaW1hZ2UvcG5nIiBwaG90b3Nob3A6Q29sb3JNb2RlPSIzIiB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOjU3MGFmN2ZhLTkxODktNTE0OS04MDY5LWFkYzU1YTcyMTUwMyIgeG1wTU06RG9jdW1lbnRJRD0i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">Digital Agency</a>'
     });
 
-    const Nether = L.tileLayer('MapTiles/Nether/{x},{y}.png', {
+    var Nether = L.tileLayer('MapTiles/Nether/{x},{y}.png', {
         maxZoom: 4,
         minZoom: -2,
         tileSize: (512 * Math.pow(2, 0)) * 2,
@@ -65,7 +70,7 @@ document.addEventListener('DOMContentLoaded', function() {
         attribution: '<a class="attribution-agency" href="https://lemon4ik6484.github.io/Digital-Agency/" target="_blank"><img style="height: 12px;" class="agency-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAAEACAYAAABccqhmAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAFbmlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgOS4xLWMwMDIgNzkuZGJhM2RhMywgMjAyMy8xMi8xMy0wNTowNjo0OSAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczpkYz0iaHR0cDovL3B1cmwub3JnL2RjL2VsZW1lbnRzLzEuMS8iIHhtbG5zOnBob3Rvc2hvcD0iaHR0cDovL25zLmFkb2JlLmNvbS9waG90b3Nob3AvMS4wLyIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0RXZ0PSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VFdmVudCMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIDI1LjcgKFdpbmRvd3MpIiB4bXA6Q3JlYXRlRGF0ZT0iMjAyNC0wNy0xNVQxMjo0MzozNyswMjowMCIgeG1wOk1vZGlmeURhdGU9IjIwMjQtMDctMTVUMTI6NTA6MjErMDI6MDAiIHhtcDpNZXRhZGF0YURhdGU9IjIwMjQtMDctMTVUMTI6NTA6MjErMDI6MDAiIGRjOmZvcm1hdD0iaW1hZ2UvcG5nIiBwaG90b3Nob3A6Q29sb3JNb2RlPSIzIiB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOjU3MGFmN2ZhLTkxODktNTE0OS04MDY5LWFkYzU1YTcyMTUwMyIgeG1wTU06RG9jdW1lbnRJRD0i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">Digital Agency</a>'
     });
 
-    const End = L.tileLayer('MapTiles/End/{x},{y}.png', {
+    var End = L.tileLayer('MapTiles/End/{x},{y}.png', {
         maxZoom: 4,
         minZoom: -2,
         tileSize: (512 * Math.pow(2, 0)) * 2,
@@ -75,85 +80,99 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // WAYPOINT ICONS //
 
-    const station = L.icon({
+    var station = L.icon({
         iconUrl: './waypoints/station.png',
         iconSize: [32, 32],
         iconAnchor: [16, 16],
         popupAnchor: [0, 40]
     });
 
-    const stationSmall = L.icon({
+    var stationSmall = L.icon({
         iconUrl: './waypoints/station_small.png',
         iconSize: [16, 16], 
         iconAnchor: [8, 8],
         popupAnchor: [0, 40]
     });
 
-    const base = L.icon({
+    var base = L.icon({
         iconUrl: './waypoints/base.png',
         iconSize: [32, 32],
         iconAnchor: [16, 16],
         popupAnchor: [0, 40]
     });
 
-    const baseSmall = L.icon({
+    var baseSmall = L.icon({
         iconUrl: './waypoints/base_small.png',
         iconSize: [12, 12],
         iconAnchor: [6, 6],
         popupAnchor: [0, 40]
     });
 
-    const ocean = L.icon({
+    var ocean = L.icon({
         iconUrl: './waypoints/ocean.png',
         iconSize: [32, 32],
         iconAnchor: [16, 16],
         popupAnchor: [0, 40]
     });
 
-    const oceanSmall = L.icon({
+    var oceanSmall = L.icon({
         iconUrl: './waypoints/ocean_small.png',
         iconSize: [12, 12],
         iconAnchor: [6, 6],
         popupAnchor: [0, 40]
     });
 
-    const memorial = L.icon({
+    var memorial = L.icon({
         iconUrl: './waypoints/memorial.png',
         iconSize: [32, 32],
         iconAnchor: [16, 16],
         popupAnchor: [0, 40]
     });
 
-    const memorialSmall = L.icon({
+    var memorialSmall = L.icon({
         iconUrl: './waypoints/memorial_small.png',
         iconSize: [12, 12],
         iconAnchor: [6, 6],
         popupAnchor: [0, 40]
     });
 
-    const other = L.icon({
+    var other = L.icon({
         iconUrl: './waypoints/other.png',
         iconSize: [32, 32],
         iconAnchor: [16, 16],
         popupAnchor: [0, 40]
     });
 
-    const otherSmall = L.icon({
+    var otherSmall = L.icon({
         iconUrl: './waypoints/other_small.png',
         iconSize: [12, 12],
         iconAnchor: [6, 6],
         popupAnchor: [0, 40]
     });
 
-    const terrain = L.icon({
+    var terrain = L.icon({
         iconUrl: './waypoints/terrain.png',
         iconSize: [32, 32],
         iconAnchor: [16, 16],
         popupAnchor: [0, 40]
     });
 
-    const terrainSmall = L.icon({
+    var terrainSmall = L.icon({
         iconUrl: './waypoints/terrain_small.png',
+        iconSize: [12, 12],
+        iconAnchor: [6, 6],
+        popupAnchor: [0, 40]
+    });
+
+    var visual = L.icon({
+        iconUrl: './waypoints/visual.png',
+        iconSize: [32, 32],
+        iconAnchor: [16, 16],
+        popupAnchor: [0, 40]
+    });
+
+    var visualSmall = L.icon({
+        iconUrl: './waypoints/visual_small.png',
         iconSize: [12, 12],
         iconAnchor: [6, 6],
         popupAnchor: [0, 40]
@@ -167,111 +186,113 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // WAYPOINTS //
 
+    const Waypoints = {}
+
     // terrain
 
-    const TellusIsland = L.marker([-2760, 2028], {icon:terrain}).bindPopup("Tellus Island", {className:'terrain'})
+    Waypoints.TellusIsland = L.marker([-2760, 2028], {icon:terrain}).bindPopup("Tellus Island", {className:'terrain'})
 
     // oceans
 
-    const LukewarmBay = L.marker([-3353, 1833], {icon:ocean}).bindPopup("Lukewarm Bay", {className:'ocean'})
+    Waypoints.LukewarmBay = L.marker([-3353, 1833], {icon:ocean}).bindPopup("Lukewarm Bay", {className:'ocean'})
 
-    const lakeLycia = L.marker([-2603, 2171], {icon:ocean}).bindPopup("Lake Lycia", {className:'ocean'})
+    Waypoints.lakeLycia = L.marker([-2603, 2171], {icon:ocean}).bindPopup("Lake Lycia", {className:'ocean'})
 
     // memorials
 
-    const L6Statue = L.marker([-3399, 2021.25], {icon: memorial}).bindPopup("First L6 Train<br>Statue", {className:'memorial'})
+    Waypoints.L6Statue = L.marker([-3399, 2021.25], {icon: memorial}).bindPopup("First L6 Train<br>Statue", {className:'memorial'})
 
-    const WompChurch = L.marker([-3273, 2195], {icon:memorial}).bindPopup("Church of Womp", {className:'memorial'})
+    Waypoints.WompChurch = L.marker([-3273, 2195], {icon:memorial}).bindPopup("Church of Womp", {className:'memorial'})
 
     // bases
 
-    const Mills = L.marker([-2879, 2588], {icon:base}).bindPopup("Mills", {className:'base'})
+    Waypoints.Mills = L.marker([-2879, 2588], {icon:base}).bindPopup("Mills", {className:'base'})
 
     //big stations
 
-    const Central = L.marker([-3126.25, 2210.75], {icon: station}).bindPopup(popupStation("CR", "Central", "L1, L2, A, B, D"), {className:'station'});
+    Waypoints.Central = L.marker([-3126.25, 2210.75], {icon: station}).bindPopup(popupStation("CR", "Central", "L1, L2, A, B, D"), {className:'station'});
 
-    const LyciaBridge = L.marker([-2629.125, 2141.5], {icon:station}).bindPopup(popupStation("CR","Lycia Bridge", "L1, R11, L21, A"), {className:'station'})
+    Waypoints.LyciaBridge = L.marker([-2629.125, 2141.5], {icon:station}).bindPopup(popupStation("CR","Lycia Bridge", "L1, R11, L21, A"), {className:'station'})
 
-    const JungletownTemple = L.marker([-3760.25, 1783.5], {icon:station}).bindPopup(popupStation("CR","Jungletown Temple", "L6, L8, R13, R14, D"), {className:'station'})
+    Waypoints.JungletownTemple = L.marker([-3760.25, 1783.5], {icon:station}).bindPopup(popupStation("CR","Jungletown Temple", "L6, L8, R13, R14, D"), {className:'station'})
 
-    const Communista = L.marker([-3774.5, 2424.5], {icon:station}).bindPopup(popupStation("CR","Communista","R12, R13"), {className:'station'})
+    Waypoints.Communista = L.marker([-3774.5, 2424.5], {icon:station}).bindPopup(popupStation("CR","Communista","R12, R13"), {className:'station'})
 
-    const Grimsbypeaks = L.marker([-4273.5, 2013.75], {icon:station}).bindPopup(popupStation("CR","Grimsby Peaks","R12, R13, R14"), {className:'station'})
+    Waypoints.Grimsbypeaks = L.marker([-4273.5, 2013.75], {icon:station}).bindPopup(popupStation("CR","Grimsby Peaks","R12, R13, R14"), {className:'station'})
 
-    const NeoArcania = L.marker([-1719.75, 2309.75], {icon:station}).bindPopup(popupStation("CR","Neo Arcania","R11, L22, A"), {className:'station'})
+    Waypoints.NeoArcania = L.marker([-1719.75, 2309.75], {icon:station}).bindPopup(popupStation("CR","Neo Arcania","R11, L22, A"), {className:'station'})
 
-    const Krunkeria = L.marker([-2642.125, 3442.25], {icon:station}).bindPopup(popupStation("CR","Krunkeria","B"), {className:'station'})
+    Waypoints.Krunkeria = L.marker([-2642.125, 3442.25], {icon:station}).bindPopup(popupStation("CR","Krunkeria","B"), {className:'station'})
 
-    const NewIndustria = L.marker([-4719.5, 1008.25], {icon:station}).bindPopup(popupStation("CR","New Industria","R12"), {className:'station'})
+    Waypoints.NewIndustria = L.marker([-4719.5, 1008.25], {icon:station}).bindPopup(popupStation("CR","New Industria","R12"), {className:'station'})
 
-    const StaraWies = L.marker([-5045.875, 2228.875], {icon:station}).bindPopup(popupStation("CR","Stara Wieś","R14"), {className:'station'})
+    Waypoints.StaraWies = L.marker([-5045.875, 2228.875], {icon:station}).bindPopup(popupStation("CR","Stara Wieś","R14"), {className:'station'})
 
-    const Riverant = L.marker([-3374.5, 2094.25], {icon:station}).bindPopup(popupStation("CR","Riverant","L1, L6, L23, M31"), {className:'station'})
+    Waypoints.Riverant = L.marker([-3374.5, 2094.25], {icon:station}).bindPopup(popupStation("CR","Riverant","L1, L6, L23, M31"), {className:'station'})
 
-    const Capitalistopia = L.marker([-2438, 1912.5], {icon:station}).bindPopup(popupStation("CR","Capitalistopia","L21"), {className:'station'})
+    Waypoints.Capitalistopia = L.marker([-2438, 1912.5], {icon:station}).bindPopup(popupStation("CR","Capitalistopia","L21"), {className:'station'})
 
-    const Dragonstone= L.marker([-3418.75, 2605.25], {icon:station}).bindPopup(popupStation("CR","Dragonstone","L2"), {className:'station'})
+    Waypoints.Dragonstone= L.marker([-3418.75, 2605.25], {icon:station}).bindPopup(popupStation("CR","Dragonstone","L2"), {className:'station'})
 
-    const Rublenika = L.marker([-1891, 2242], {icon:station}).bindPopup(popupStation("CR","Rublenika","R11"), {className:'station'})
+    Waypoints.Rublenika = L.marker([-1891, 2242], {icon:station}).bindPopup(popupStation("CR","Rublenika","R11"), {className:'station'})
 
     //small stations
     
-    const Blossomingvalley = L.marker([-2791.5, 2226], {icon:station}).bindPopup(popupStation("CR","Blossoming Valley","L1, L2"), {className:'station'})
+    Waypoints.Blossomingvalley = L.marker([-2791.5, 2226], {icon:station}).bindPopup(popupStation("CR","Blossoming Valley","L1, L2"), {className:'station'})
 
-    const Cherryville = L.marker([-2969.375, 2263], {icon:station}).bindPopup(popupStation("CR","Cherryville","L2"), {className:'station'})
+    Waypoints.Cherryville = L.marker([-2969.375, 2263], {icon:station}).bindPopup(popupStation("CR","Cherryville","L2"), {className:'station'})
 
-    const Refinery = L.marker([-2756, 2169.625], {icon:station}).bindPopup(popupStation("CR","Refinery","L2"), {className:'station'})
+    Waypoints.Refinery = L.marker([-2756, 2169.625], {icon:station}).bindPopup(popupStation("CR","Refinery","L2"), {className:'station'})
 
-    const FortBoreas = L.marker([-2723.375, 2064.25], {icon:station}).bindPopup(popupStation("CR","Fort Boreas","L2"), {className:'station'})
+    Waypoints.FortBoreas = L.marker([-2723.375, 2064.25], {icon:station}).bindPopup(popupStation("CR","Fort Boreas","L2"), {className:'station'})
 
-    const Hammerington = L.marker([-2807.625, 2051.875], {icon:station}).bindPopup(popupStation("CR","Hammerington","L2"), {className:'station'})
+    Waypoints.Hammerington = L.marker([-2807.625, 2051.875], {icon:station}).bindPopup(popupStation("CR","Hammerington","L2"), {className:'station'})
 
-    const LyciaNewport = L.marker([-2726.375, 2175.25], {icon:station}).bindPopup(popupStation("CR","Lycia Newport","L1"), {className:'station'})
+    Waypoints.LyciaNewport = L.marker([-2726.375, 2175.25], {icon:station}).bindPopup(popupStation("CR","Lycia Newport","L1"), {className:'station'})
 
-    const WompWomp = L.marker([-3263.75, 2180.5], {icon:station}).bindPopup(popupStation("CR","Womp Womp","L1"), {className:'station'})
+    Waypoints.WompWomp = L.marker([-3263.75, 2180.5], {icon:station}).bindPopup(popupStation("CR","Womp Womp","L1"), {className:'station'})
 
-    const LycentPlateau = L.marker([-3147.25, 2316.5], {icon:station}).bindPopup(popupStation("CR","Lycent Plateau","L2"), {className:'station'})
+    Waypoints.LycentPlateau = L.marker([-3147.25, 2316.5], {icon:station}).bindPopup(popupStation("CR","Lycent Plateau","L2"), {className:'station'})
 
-    const IsleofWheat = L.marker([-3241.75, 2428.75], {icon:station}).bindPopup(popupStation("CR","Isle of Wheat","L2"), {className:'station'})
+    Waypoints.IsleofWheat = L.marker([-3241.75, 2428.75], {icon:station}).bindPopup(popupStation("CR","Isle of Wheat","L2"), {className:'station'})
 
-    const Timberland = L.marker([-3392, 1995.75], {icon:station}).bindPopup(popupStation("CR","Timberland","L6"), {className:'station'})
+    Waypoints.Timberland = L.marker([-3392, 1995.75], {icon:station}).bindPopup(popupStation("CR","Timberland","L6"), {className:'station'})
 
-    const MiddleseaBeach = L.marker([-3578, 1924.5], {icon:station}).bindPopup(popupStation("CR","Middlesea Beach","L6, L8"), {className:'station'})
+    Waypoints.MiddleseaBeach = L.marker([-3578, 1924.5], {icon:station}).bindPopup(popupStation("CR","Middlesea Beach","L6, L8"), {className:'station'})
 
-    const SouthernCross = L.marker([-3579, 2023.5], {icon:station}).bindPopup(popupStation("CR","Southern Cross","L8"), {className:'station'})
+    Waypoints.SouthernCross = L.marker([-3579, 2023.5], {icon:station}).bindPopup(popupStation("CR","Southern Cross","L8"), {className:'station'})
 
-    const Birchland = L.marker([-3536.5, 2109.5], {icon:station}).bindPopup(popupStation("CR","Birchland","L8"), {className:'station'})
+    Waypoints.Birchland = L.marker([-3536.5, 2109.5], {icon:station}).bindPopup(popupStation("CR","Birchland","L8"), {className:'station'})
 
-    const PortAndesworth = L.marker([-3633.5, 2160], {icon:station}).bindPopup(popupStation("CR","Port Andesworth","L8, L23"), {className:'station'})
+    Waypoints.PortAndesworth = L.marker([-3633.5, 2160], {icon:station}).bindPopup(popupStation("CR","Port Andesworth","L8, L23"), {className:'station'})
 
-    const JungletownIndustrial = L.marker([-3649, 1790], {icon:station}).bindPopup(popupStation("CR","Jungletown Industrial","L6, L8"), {className:'station'})
+    Waypoints.JungletownIndustrial = L.marker([-3649, 1790], {icon:station}).bindPopup(popupStation("CR","Jungletown Industrial","L6, L8"), {className:'station'})
 
-    const Atombeach= L.marker([-3238, 1913.75], {icon:station}).bindPopup(popupStation("CR","Atom Beach","L23"), {className:'station'})
+    Waypoints.Atombeach= L.marker([-3238, 1913.75], {icon:station}).bindPopup(popupStation("CR","Atom Beach","L23"), {className:'station'})
 
-    const OldIndustria = L.marker([-3718, 2023.5], {icon:station}).bindPopup(popupStation("CR","Old Industria","M31"), {className:'station'})
+    Waypoints.OldIndustria = L.marker([-3718, 2023.5], {icon:station}).bindPopup(popupStation("CR","Old Industria","M31"), {className:'station'})
 
-    const Rybnik = L.marker([-3934, 1756], {icon:station}).bindPopup(popupStation("CR","Rybnik","L8"), {className:'station'})
+    Waypoints.Rybnik = L.marker([-3934, 1756], {icon:station}).bindPopup(popupStation("CR","Rybnik","L8"), {className:'station'})
 
-    const EndPortal = L.marker([-4009, 1662.25], {icon:station}).bindPopup(popupStation("CR","End Portal","L8"), {className:'station'})
+    Waypoints.EndPortal = L.marker([-4009, 1662.25], {icon:station}).bindPopup(popupStation("CR","End Portal","L8"), {className:'station'})
 
-    const mtOnk = L.marker([-4657, 1986], {icon:station}).bindPopup(popupStation("CR","Mt. Onk","R12"), {className:'station'})
+    Waypoints.mtOnk = L.marker([-4657, 1986], {icon:station}).bindPopup(popupStation("CR","Mt. Onk","R12"), {className:'station'})
 
-    const OakRidge = L.marker([4519, 2095], {icon:station}).bindPopup(popupStation("CR","Oakridge","R14"), {className:'station'})
+    Waypoints.OakRidge = L.marker([4519, 2095], {icon:station}).bindPopup(popupStation("CR","Oakridge","R14"), {className:'station'})
 
-    const Cheeseland = L.marker([-4682, 2201], {icon:station}).bindPopup(popupStation("CR","Cheeseland","R14"), {className:'station'})
+    Waypoints.Cheeseland = L.marker([-4682, 2201], {icon:station}).bindPopup(popupStation("CR","Cheeseland","R14"), {className:'station'})
 
-    const HighlandEast = L.marker([-2434, 2228], {icon:station}).bindPopup(popupStation("CR","Highland East","R11"), {className:'station'})
+    Waypoints.HighlandEast = L.marker([-2434, 2228], {icon:station}).bindPopup(popupStation("CR","Highland East","R11"), {className:'station'})
 
-    const NorthernShores = L.marker([-1674, 2181], {icon:station}).bindPopup(popupStation("CR","Northern Shores","L22"), {className:'station'})
+    Waypoints.NorthernShores = L.marker([-1674, 2181], {icon:station}).bindPopup(popupStation("CR","Northern Shores","L22"), {className:'station'})
 
-    const GrimsbyHarbor = L.marker([-4085, 2032], {icon:station}).bindPopup(popupStation("CR","Grimsby Harbor","R13, R12"), {className:'station'})
+    Waypoints.GrimsbyHarbor = L.marker([-4085, 2032], {icon:station}).bindPopup(popupStation("CR","Grimsby Harbor","R13, R12"), {className:'station'})
 
 
 
     // ZONES //
 
-    const CentralOcean = L.polygon([
+    var CentralOcean = L.polygon([
         [-2423.5, 1676.25],
         [-2565.25, 1929.25],
         [-2621.75, 1975],
@@ -328,9 +349,9 @@ document.addEventListener('DOMContentLoaded', function() {
         [-2641.25, 1510],
         [-2596.5, 1383.125],
         [-2412.75, 1478.875]
-    ], {color: '#D3FFCE', fillColor: '#065535'}).bindPopup("Central Ocean", {className: 'ocean'});
+    ], {color: '#D3FFCE', fillColor: '#065535'})//.bindPopup("Central Ocean", {className: 'ocean'});
 
-    const Westbeach = L.polygon([
+    var Westbeach = L.polygon([
         [-3415.1875, 1774.125],
         [-3418.5, 1736],
         [-3447.5, 1679.75],
@@ -366,9 +387,9 @@ document.addEventListener('DOMContentLoaded', function() {
         [-3253.5, 1756],
         [-3334.5, 1742],
         [-3354.5, 1721.5]
-    ], {color: '#D3FFCE', fillColor: '#065535'}).bindPopup("Westbeach", {className:'terrain'});//
+    ], {color: '#D3FFCE', fillColor: '#065535'})//.bindPopup("Westbeach", {className:'terrain'});
 
-    const CentralPlains = L.polygon([
+    var CentralPlains = L.polygon([
         [-2621.75, 1975],
         [-2621.363016, 2093.638975],
         [-2570.5, 2081.75],
@@ -408,9 +429,9 @@ document.addEventListener('DOMContentLoaded', function() {
         [-2845.75, 1998.75],
         [-2730.250028, 1934.250215],
         [-2664.25, 1979.25]
-    ], {color: '#D3FFCE', fillColor: '#065535'}).bindPopup("Central Plains", {className:'terrain'});
+    ], {color: '#D3FFCE', fillColor: '#065535'})//.bindPopup("Central Plains", {className:'terrain'});
 
-    const Middlesea = L.polygon([
+    var Middlesea = L.polygon([
         [-3320.125, 2140.1875],
         [-3333.375, 2157.875],
         [-3333.0625, 2219],
@@ -450,9 +471,9 @@ document.addEventListener('DOMContentLoaded', function() {
         [-3338.625, 2064.875],
         [-3315.375, 2087.625],
         [-3316.75, 2133.125]
-    ], {color: '#D3FFCE', fillColor: '#065535'}).bindPopup("Middlesea", {className:'terrain'});
+    ], {color: '#D3FFCE', fillColor: '#065535'})//.bindPopup("Middlesea", {className:'terrain'});
     
-    const Highlands = L.polygon([
+    var Highlands = L.polygon([
         [-2540, 2233.125],
         [-2152, 2233.5],
         [-2133.25, 1966.5],
@@ -476,9 +497,9 @@ document.addEventListener('DOMContentLoaded', function() {
         [-2620.75, 2093.5],
         [-2570.5, 2081.8125],
         [-2539.4375, 2127.0625]
-    ], {color: '#D3FFCE', fillColor: '#065535'}).bindPopup("Highlands", {className:'terrain'});//
+    ], {color: '#D3FFCE', fillColor: '#065535'})//.bindPopup("Highlands", {className:'terrain'});
 
-    const Heights = L.polygon([
+    var Heights = L.polygon([
         [-2152.064792, 2233.500109],
         [-2078, 2398],
         [-2075.125, 2583.75],
@@ -506,9 +527,9 @@ document.addEventListener('DOMContentLoaded', function() {
         [-2581.125, 2340.625],
         [-2540, 2256.25],
         [-2539.9375, 2233.1875]
-    ], {color: '#D3FFCE', fillColor: '#065535'}).bindPopup("Heights", {className:'terrain'});//
+    ], {color: '#D3FFCE', fillColor: '#065535'})//.bindPopup("Heights", {className:'terrain'});
 
-    const SouthernOcean = L.polygon([
+    var SouthernOcean = L.polygon([
         [-3813.5, 1811.5],
         [-3860, 1769],
         [-3943.5, 1791],
@@ -561,9 +582,9 @@ document.addEventListener('DOMContentLoaded', function() {
         [-3688.5, 1874.5],
         [-3741.5, 1866],
         [-3813.5, 1811.5]
-    ], {color: '#D3FFCE', fillColor: '#065535'}).bindPopup("Southern Ocean", {className:'ocean'});//
+    ], {color: '#D3FFCE', fillColor: '#065535'})//.bindPopup("Southern Ocean", {className:'ocean'});
 
-    const Woodsdale = L.polygon([
+    var Woodsdale = L.polygon([
         [-2729.5, 3259.5],
         [-2528, 3105.25],
         [-2512.5, 2931.5],
@@ -599,9 +620,9 @@ document.addEventListener('DOMContentLoaded', function() {
         [-3284, 2861],
         [-3171, 2806],
         [-2936, 2905]
-    ], {color: '#D3FFCE', fillColor: '#065535'}).bindPopup("Woodsdale", {className:'terrain'});//
+    ], {color: '#D3FFCE', fillColor: '#065535'})//.bindPopup("Woodsdale", {className:'terrain'});
 
-    const PolarHills = L.polygon([
+    var PolarHills = L.polygon([
         [-3396.75, 3208.75],
         [-3284, 2861],
         [-3171, 2806],
@@ -623,9 +644,9 @@ document.addEventListener('DOMContentLoaded', function() {
         [-3580, 3629.5],
         [-3514, 3573.5],
         [-3453, 3422]
-    ], {color: '#D3FFCE', fillColor: '#065535'}).bindPopup("Polar Hills", {className:'terrain'});//
+    ], {color: '#D3FFCE', fillColor: '#065535'})//.bindPopup("Polar Hills", {className:'terrain'});
 
-    const Shoreden = L.polygon([
+    var Shoreden = L.polygon([
         [-3719.25, 1633.5],
         [-3814.25, 1617.5],
         [-3853.75, 1576.75],
@@ -676,11 +697,11 @@ document.addEventListener('DOMContentLoaded', function() {
         [-3741.5, 1866],
         [-3813.5, 1811.5],
         [-3788.375, 1736]
-    ], {color: '#D3FFCE', fillColor: '#065535'}).bindPopup("Shoreden", {className:'terrain'});//
+    ], {color: '#D3FFCE', fillColor: '#065535'})//.bindPopup("Shoreden", {className:'terrain'});
 
     // LAYER CONTROL //
 
-    const regions = [
+    var regions = [
         CentralOcean, 
         Westbeach, 
         CentralPlains, 
@@ -693,130 +714,130 @@ document.addEventListener('DOMContentLoaded', function() {
         Shoreden
     ]
 
-    const stations = [
-        Central, 
-        LyciaBridge, 
-        JungletownTemple,
-        Communista,
-        Grimsbypeaks,
-        NeoArcania,
-        Krunkeria,
-        NewIndustria,
-        StaraWies,
-        Riverant,
-        Capitalistopia,
-        Dragonstone,
-        Rublenika,
-        Blossomingvalley,
-        Cherryville,
-        Refinery,
-        FortBoreas,
-        Hammerington,
-        LyciaNewport,
-        WompWomp,
-        LycentPlateau,
-        IsleofWheat,
-        Timberland,
-        MiddleseaBeach,
-        SouthernCross,
-        Birchland,
-        PortAndesworth,
-        JungletownIndustrial,
-        Atombeach,
-        OldIndustria,
-        Rybnik,
-        EndPortal,
-        mtOnk,
-        OakRidge,
-        Cheeseland,
-        HighlandEast,
-        NorthernShores,
-        GrimsbyHarbor
+    var stations = [
+        Waypoints.Central, 
+        Waypoints.JungletownTemple,
+        Waypoints.LyciaBridge, 
+        Waypoints.Communista,
+        Waypoints.Grimsbypeaks,
+        Waypoints.NeoArcania,
+        Waypoints.Krunkeria,
+        Waypoints.NewIndustria,
+        Waypoints.StaraWies,
+        Waypoints.Riverant,
+        Waypoints.Capitalistopia,
+        Waypoints.Dragonstone,
+        Waypoints.Rublenika,
+        Waypoints.Blossomingvalley,
+        Waypoints.Cherryville,
+        Waypoints.Refinery,
+        Waypoints.FortBoreas,
+        Waypoints.Hammerington,
+        Waypoints.LyciaNewport,
+        Waypoints.WompWomp,
+        Waypoints.LycentPlateau,
+        Waypoints.IsleofWheat,
+        Waypoints.Timberland,
+        Waypoints.MiddleseaBeach,
+        Waypoints.SouthernCross,
+        Waypoints.Birchland,
+        Waypoints.PortAndesworth,
+        Waypoints.JungletownIndustrial,
+        Waypoints.Atombeach,
+        Waypoints.OldIndustria,
+        Waypoints.Rybnik,
+        Waypoints.EndPortal,
+        Waypoints.mtOnk,
+        Waypoints.OakRidge,
+        Waypoints.Cheeseland,
+        Waypoints.HighlandEast,
+        Waypoints.NorthernShores,
+        Waypoints.GrimsbyHarbor
     ]
 
-    const bigStations = [
-        Central,
-        LyciaBridge,
-        JungletownTemple,
-        Communista,
-        Grimsbypeaks,
-        NeoArcania,
-        Krunkeria,
-        NewIndustria,
-        StaraWies,
-        Riverant,
-        Capitalistopia,
-        Dragonstone,
-        Rublenika
+    var bigStations = [
+        Waypoints.Central,
+        Waypoints.LyciaBridge,
+        Waypoints.JungletownTemple,
+        Waypoints.Communista,
+        Waypoints.Grimsbypeaks,
+        Waypoints.NeoArcania,
+        Waypoints.Krunkeria,
+        Waypoints.NewIndustria,
+        Waypoints.StaraWies,
+        Waypoints.Riverant,
+        Waypoints.Capitalistopia,
+        Waypoints.Dragonstone,
+        Waypoints.Rublenika
     ]
 
-    const smallStations = [
-        Blossomingvalley,
-        Cherryville,
-        Refinery,
-        FortBoreas,
-        Hammerington,
-        LyciaNewport,
-        WompWomp,
-        LycentPlateau,
-        IsleofWheat,
-        Timberland,
-        MiddleseaBeach,
-        SouthernCross,
-        Birchland,
-        PortAndesworth,
-        JungletownIndustrial,
-        Atombeach,
-        OldIndustria,
-        Rybnik,
-        EndPortal,
-        mtOnk,
-        OakRidge,
-        Cheeseland,
-        HighlandEast,
-        NorthernShores,
-        GrimsbyHarbor
+    var smallStations = [
+        Waypoints.Blossomingvalley,
+        Waypoints.Cherryville,
+        Waypoints.Refinery,
+        Waypoints.FortBoreas,
+        Waypoints.Hammerington,
+        Waypoints.LyciaNewport,
+        Waypoints.WompWomp,
+        Waypoints.LycentPlateau,
+        Waypoints.IsleofWheat,
+        Waypoints.Timberland,
+        Waypoints.MiddleseaBeach,
+        Waypoints.SouthernCross,
+        Waypoints.Birchland,
+        Waypoints.PortAndesworth,
+        Waypoints.JungletownIndustrial,
+        Waypoints.Atombeach,
+        Waypoints.OldIndustria,
+        Waypoints.Rybnik,
+        Waypoints.EndPortal,
+        Waypoints.mtOnk,
+        Waypoints.OakRidge,
+        Waypoints.Cheeseland,
+        Waypoints.HighlandEast,
+        Waypoints.NorthernShores,
+        Waypoints.GrimsbyHarbor
     ]
 
-    const memorials = [
-        L6Statue,
-        WompChurch
+    var memorials = [
+        Waypoints.L6Statue,
+        Waypoints.WompChurch
     ]
 
-    const bases = [
-        Mills
+    var bases = [
+        Waypoints.Mills
     ]
 
-    const oceans = [
-        LukewarmBay,
-        lakeLycia
+    var oceans = [
+        Waypoints.LukewarmBay,
+        Waypoints.lakeLycia
     ]
 
-    const others = [
-
+    var others = [
+        
     ]
 
-    const terrains = [
-        TellusIsland
+    var terrains = [
+        Waypoints.TellusIsland
     ]
 
     // please dont edit groups below, edit arrays abowe instead!
 
-    const stationsGroup = L.layerGroup(stations);
+    var stationsGroup = L.layerGroup(stations);
 
-    const regionsGroup = L.layerGroup(regions);
+    var regionsGroup = L.layerGroup(regions);
 
-    const memorialsGroup = L.layerGroup(memorials);
+    var memorialsGroup = L.layerGroup(memorials);
 
-    const basesGroup = L.layerGroup(bases);
+    var basesGroup = L.layerGroup(bases);
 
-    const oceansGroup = L.layerGroup(oceans);
+    var oceansGroup = L.layerGroup(oceans);
 
-    const othersGroup = L.layerGroup(others);
+    var othersGroup = L.layerGroup(others);
 
-    const terrainsGroup = L.layerGroup(terrains);
+    var terrainsGroup = L.layerGroup(terrains);
 
-    const Groups = [
+    var Groups = [
         { group: stationsGroup, name: 'stations' },
         { group: regionsGroup, name: 'regions' },
         { group: memorialsGroup, name: 'memorials' },
@@ -826,18 +847,19 @@ document.addEventListener('DOMContentLoaded', function() {
         { group: terrainsGroup, name: 'terrains' }
     ];
 
-    const map = L.map('map', {
+    var map = L.map('map', {
         crs: L.CRS.Simple,
-        layers: [Overworld, regionsGroup, stationsGroup]
+        layers: [Overworld, regionsGroup, stationsGroup],
+        center: [-3125, 2234.5],
     }).setView([-3150, 2250], defaultZoom);
 
-    const Maps = {
+    var Maps = {
         "Overworld": Overworld,
         "Nether": Nether,
         "The End": End
     };
     
-    const Waypoints = {
+    var WaypointTypes = {
         "Regions": regionsGroup,
         "Stations": stationsGroup,
         "Memorials": memorialsGroup,
@@ -847,15 +869,23 @@ document.addEventListener('DOMContentLoaded', function() {
         "Other": othersGroup
     };
 
-    const layerControl = L.control.layers(Maps, Waypoints).addTo(map);
+    var layerControl = L.control.layers(Maps, WaypointTypes).addTo(map);
 
-    loadMapBounds()
-    loadLayers()
+    var WaypointParam = getQueryParam('waypoint');
+    if (WaypointParam) {
+        var Coords = Waypoints[WaypointParam].getLatLng();
+        map.setView([Coords.lat, Coords.lng], 2);
+        mapRedraw();
+        Waypoints[WaypointParam].openPopup();
+    } else {
+        loadMapBounds()
+        loadLayers()
+    }
 
     // EVENTS/FUNCTIONS //
 
     function mapRedraw() {
-        const zoom = map.getZoom();
+        var zoom = map.getZoom();
         Overworld.options.tileSize = (512 * Math.pow(2, zoom - defaultZoom)) * 2;
         Overworld.redraw();
 
@@ -873,7 +903,7 @@ document.addEventListener('DOMContentLoaded', function() {
     map.on('zoomend', function() {
         var zoomLevel = map.getZoom();
 
-        const reallySmallStationIcon = L.icon({
+        var reallySmallStationIcon = L.icon({
             iconUrl: './waypoints/station_small.png',
             iconSize: [12, 12], 
             iconAnchor: [6, 6],
@@ -907,7 +937,7 @@ document.addEventListener('DOMContentLoaded', function() {
         saveMapBounds()
     });
 
-    const popup = L.popup();
+    var popup = L.popup();
 
     map.on('click', function(e) {
         popup
