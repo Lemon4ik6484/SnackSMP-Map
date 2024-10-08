@@ -201,9 +201,9 @@ document.addEventListener('DOMContentLoaded', function() {
             let parts = text.match(/"([^"]+)"/g);
             let stationName = parts[0].replace(/"/g, '');
             let stationLines = parts[1].replace(/"/g, '');
-            Waypoints[name] = L.marker([X, Y], {icon:Icons[type]}).bindPopup(popupStation(stationName, stationLines), {className:type});
+            Waypoints[name] = L.marker([X, Y], {icon: Icons[type]}).bindPopup(popupStation(stationName, stationLines), {className:type});
         } else {
-            Waypoints[name] = L.marker([X, Y], {icon:type}).bindPopup(text, {className:type});
+            Waypoints[name] = L.marker([X, Y], {icon: Icons[type]}).bindPopup(text, {className:type});
         }
 
         Waypoints[name].addTo(map);
@@ -244,7 +244,7 @@ document.addEventListener('DOMContentLoaded', function() {
     .then(data => {
         console.log('Obtained waypoint data:', data);
         const rows = data.values;
-        rows.forEach(row => {
+        rows?.forEach(row => {
             createWaypoint(row[0], row[1], row[2], row[3], row[4]);
         });
     })
