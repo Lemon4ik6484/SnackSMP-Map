@@ -80,215 +80,177 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // WAYPOINT ICONS //
 
-    var station = L.icon({
+    const Icons = {};    
+
+    Icons.station = L.icon({
         iconUrl: './waypoints/station.png',
         iconSize: [32, 32],
         iconAnchor: [16, 16],
         popupAnchor: [0, 40]
     });
 
-    var stationSmall = L.icon({
+    Icons.stationSmall = L.icon({
         iconUrl: './waypoints/station_small.png',
         iconSize: [16, 16], 
         iconAnchor: [8, 8],
         popupAnchor: [0, 40]
     });
 
-    var base = L.icon({
+    Icons.base = L.icon({
         iconUrl: './waypoints/base.png',
         iconSize: [32, 32],
         iconAnchor: [16, 16],
         popupAnchor: [0, 40]
     });
 
-    var baseSmall = L.icon({
+    Icons.baseSmall = L.icon({
         iconUrl: './waypoints/base_small.png',
         iconSize: [12, 12],
         iconAnchor: [6, 6],
         popupAnchor: [0, 40]
     });
 
-    var ocean = L.icon({
+    Icons.ocean = L.icon({
         iconUrl: './waypoints/ocean.png',
         iconSize: [32, 32],
         iconAnchor: [16, 16],
         popupAnchor: [0, 40]
     });
 
-    var oceanSmall = L.icon({
+    Icons.oceanSmall = L.icon({
         iconUrl: './waypoints/ocean_small.png',
         iconSize: [12, 12],
         iconAnchor: [6, 6],
         popupAnchor: [0, 40]
     });
 
-    var memorial = L.icon({
+    Icons.memorial = L.icon({
         iconUrl: './waypoints/memorial.png',
         iconSize: [32, 32],
         iconAnchor: [16, 16],
         popupAnchor: [0, 40]
     });
 
-    var memorialSmall = L.icon({
+    Icons.memorialSmall = L.icon({
         iconUrl: './waypoints/memorial_small.png',
         iconSize: [12, 12],
         iconAnchor: [6, 6],
         popupAnchor: [0, 40]
     });
 
-    var other = L.icon({
+    Icons.other = L.icon({
         iconUrl: './waypoints/other.png',
         iconSize: [32, 32],
         iconAnchor: [16, 16],
         popupAnchor: [0, 40]
     });
 
-    var otherSmall = L.icon({
+    Icons.otherSmall = L.icon({
         iconUrl: './waypoints/other_small.png',
         iconSize: [12, 12],
         iconAnchor: [6, 6],
         popupAnchor: [0, 40]
     });
 
-    var terrain = L.icon({
+    Icons.terrain = L.icon({
         iconUrl: './waypoints/terrain.png',
         iconSize: [32, 32],
         iconAnchor: [16, 16],
         popupAnchor: [0, 40]
     });
 
-    var terrainSmall = L.icon({
+    Icons.terrainSmall = L.icon({
         iconUrl: './waypoints/terrain_small.png',
         iconSize: [12, 12],
         iconAnchor: [6, 6],
         popupAnchor: [0, 40]
     });
 
-    var visual = L.icon({
+    Icons.visual = L.icon({
         iconUrl: './waypoints/visual.png',
         iconSize: [32, 32],
         iconAnchor: [16, 16],
         popupAnchor: [0, 40]
     });
 
-    var visualSmall = L.icon({
+    Icons.visualSmall = L.icon({
         iconUrl: './waypoints/visual_small.png',
         iconSize: [12, 12],
         iconAnchor: [6, 6],
         popupAnchor: [0, 40]
     });
 
-    // random popup function (veru important)
-
-    function popupStation(Logo, Name, Lines) {
-        return "<div class='horizontal'><img class='station-logo' style='height: 20px;' src='" + "./logos/" + Logo + ".png" + "'/><p class='station-title'>" + Name + "</p></div><div class='horizontal'><p class='station-lines gray'>Lines: </p><p class='station-lines'>" + Lines + "</p></div>"
-    }
-
     // WAYPOINTS //
 
     const Waypoints = {}
 
-    // terrain
+    var stations = []
+    var memorials = []
+    var bases = []
+    var oceans = []
+    var others = []
+    var terrains = []
+    var visuals = []
 
-    Waypoints.TellusIsland = L.marker([-2760, 2028], {icon:terrain}).bindPopup("Tellus Island", {className:'terrain'})
+    function popupStation(Name, Lines) {
+        return "<div class='horizontal'><img class='station-logo' style='height: 20px;' src='" + "./logos/CR.png" + "'/><p class='station-title'>" + Name + "</p></div><div class='horizontal'><p class='station-lines gray'>Lines: </p><p class='station-lines'>" + Lines + "</p></div>"
+    }
 
-    // oceans
+    function createWaypoint(name, X, Y, type, text) {
+        if (type === "station") {
+            let parts = text.match(/"([^"]+)"/g);
+            let stationName = parts[0].replace(/"/g, '');
+            let stationLines = parts[1].replace(/"/g, '');
+            Waypoints[name] = L.marker([X, Y], {icon:Icons[type]}).bindPopup(popupStation(stationName, stationLines), {className:type});
+        } else {
+            Waypoints[name] = L.marker([X, Y], {icon:type}).bindPopup(text, {className:type});
+        }
 
-    Waypoints.LukewarmBay = L.marker([-3353, 1833], {icon:ocean}).bindPopup("Lukewarm Bay", {className:'ocean'})
+        Waypoints[name].addTo(map);
 
-    Waypoints.lakeLycia = L.marker([-2603, 2171], {icon:ocean}).bindPopup("Lake Lycia", {className:'ocean'})
+        switch (type) {
+            case "station":
+                stations.push(Waypoints[name]);
+                break
+            case "memorial":
+                memorials.push(Waypoints[name]);
+                break
+            case "ocean":
+                oceans.push(Waypoints[name]);
+                break
+            case "base":
+                bases.push(Waypoints[name]);
+                break
+            case "other":
+                others.push(Waypoints[name]);
+                break
+            case "terrain":
+                terrains.push(Waypoints[name]);
+                break
+            case "visual":
+                visuals.push(Waypoints[name]);
+                break
+        }
+    }
 
-    // memorials
+    const API_KEY = 'AIzaSyC7opujheDheDJagCtkg9PGJNNariKwWrE';
+    const SPREADSHEET_ID = '1nLXyOXjPCIKNd-l3v9IQRRu6sXxzoIuXLpyBdMQugIY';
+    const RANGE = 'Waypoints!B2:F150';
 
-    Waypoints.L6Statue = L.marker([-3399, 2021.25], {icon: memorial}).bindPopup("First L6 Train<br>Statue", {className:'memorial'})
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${RANGE}?key=${API_KEY}`;
 
-    Waypoints.WompChurch = L.marker([-3273, 2195], {icon:memorial}).bindPopup("Church of Womp", {className:'memorial'})
-
-    // bases
-
-    Waypoints.Mills = L.marker([-2879, 2588], {icon:base}).bindPopup("Mills", {className:'base'})
-
-    //big stations
-
-    Waypoints.Central = L.marker([-3126.25, 2210.75], {icon: station}).bindPopup(popupStation("CR", "Central", "L1, L2, A, B, D"), {className:'station'});
-
-    Waypoints.LyciaBridge = L.marker([-2629.125, 2141.5], {icon:station}).bindPopup(popupStation("CR","Lycia Bridge", "L1, R11, L21, A"), {className:'station'})
-
-    Waypoints.JungletownTemple = L.marker([-3760.25, 1783.5], {icon:station}).bindPopup(popupStation("CR","Jungletown Temple", "L6, L8, R13, R14, D"), {className:'station'})
-
-    Waypoints.Communista = L.marker([-3774.5, 2424.5], {icon:station}).bindPopup(popupStation("CR","Communista","R12, R13"), {className:'station'})
-
-    Waypoints.Grimsbypeaks = L.marker([-4273.5, 2013.75], {icon:station}).bindPopup(popupStation("CR","Grimsby Peaks","R12, R13, R14"), {className:'station'})
-
-    Waypoints.NeoArcania = L.marker([-1719.75, 2309.75], {icon:station}).bindPopup(popupStation("CR","Neo Arcania","R11, L22, A"), {className:'station'})
-
-    Waypoints.Krunkeria = L.marker([-2642.125, 3442.25], {icon:station}).bindPopup(popupStation("CR","Krunkeria","B"), {className:'station'})
-
-    Waypoints.NewIndustria = L.marker([-4719.5, 1008.25], {icon:station}).bindPopup(popupStation("CR","New Industria","R12"), {className:'station'})
-
-    Waypoints.StaraWies = L.marker([-5045.875, 2228.875], {icon:station}).bindPopup(popupStation("CR","Stara Wieś","R14"), {className:'station'})
-
-    Waypoints.Riverant = L.marker([-3374.5, 2094.25], {icon:station}).bindPopup(popupStation("CR","Riverant","L1, L6, L23, M31"), {className:'station'})
-
-    Waypoints.Capitalistopia = L.marker([-2438, 1912.5], {icon:station}).bindPopup(popupStation("CR","Capitalistopia","L21"), {className:'station'})
-
-    Waypoints.Dragonstone= L.marker([-3418.75, 2605.25], {icon:station}).bindPopup(popupStation("CR","Dragonstone","L2"), {className:'station'})
-
-    Waypoints.Rublenika = L.marker([-1891, 2242], {icon:station}).bindPopup(popupStation("CR","Rublenika","R11"), {className:'station'})
-
-    //small stations
-    
-    Waypoints.Blossomingvalley = L.marker([-2791.5, 2226], {icon:station}).bindPopup(popupStation("CR","Blossoming Valley","L1, L2"), {className:'station'})
-
-    Waypoints.Cherryville = L.marker([-2969.375, 2263], {icon:station}).bindPopup(popupStation("CR","Cherryville","L2"), {className:'station'})
-
-    Waypoints.Refinery = L.marker([-2756, 2169.625], {icon:station}).bindPopup(popupStation("CR","Refinery","L2"), {className:'station'})
-
-    Waypoints.FortBoreas = L.marker([-2723.375, 2064.25], {icon:station}).bindPopup(popupStation("CR","Fort Boreas","L2"), {className:'station'})
-
-    Waypoints.Hammerington = L.marker([-2807.625, 2051.875], {icon:station}).bindPopup(popupStation("CR","Hammerington","L2"), {className:'station'})
-
-    Waypoints.LyciaNewport = L.marker([-2726.375, 2175.25], {icon:station}).bindPopup(popupStation("CR","Lycia Newport","L1"), {className:'station'})
-
-    Waypoints.WompWomp = L.marker([-3263.75, 2180.5], {icon:station}).bindPopup(popupStation("CR","Womp Womp","L1"), {className:'station'})
-
-    Waypoints.LycentPlateau = L.marker([-3147.25, 2316.5], {icon:station}).bindPopup(popupStation("CR","Lycent Plateau","L2"), {className:'station'})
-
-    Waypoints.IsleofWheat = L.marker([-3241.75, 2428.75], {icon:station}).bindPopup(popupStation("CR","Isle of Wheat","L2"), {className:'station'})
-
-    Waypoints.Timberland = L.marker([-3392, 1995.75], {icon:station}).bindPopup(popupStation("CR","Timberland","L6"), {className:'station'})
-
-    Waypoints.MiddleseaBeach = L.marker([-3578, 1924.5], {icon:station}).bindPopup(popupStation("CR","Middlesea Beach","L6, L8"), {className:'station'})
-
-    Waypoints.SouthernCross = L.marker([-3579, 2023.5], {icon:station}).bindPopup(popupStation("CR","Southern Cross","L8"), {className:'station'})
-
-    Waypoints.Birchland = L.marker([-3536.5, 2109.5], {icon:station}).bindPopup(popupStation("CR","Birchland","L8"), {className:'station'})
-
-    Waypoints.PortAndesworth = L.marker([-3633.5, 2160], {icon:station}).bindPopup(popupStation("CR","Port Andesworth","L8, L23"), {className:'station'})
-
-    Waypoints.JungletownIndustrial = L.marker([-3649, 1790], {icon:station}).bindPopup(popupStation("CR","Jungletown Industrial","L6, L8"), {className:'station'})
-
-    Waypoints.Atombeach= L.marker([-3238, 1913.75], {icon:station}).bindPopup(popupStation("CR","Atom Beach","L23"), {className:'station'})
-
-    Waypoints.OldIndustria = L.marker([-3718, 2023.5], {icon:station}).bindPopup(popupStation("CR","Old Industria","M31"), {className:'station'})
-
-    Waypoints.Rybnik = L.marker([-3934, 1756], {icon:station}).bindPopup(popupStation("CR","Rybnik","L8"), {className:'station'})
-
-    Waypoints.EndPortal = L.marker([-4009, 1662.25], {icon:station}).bindPopup(popupStation("CR","End Portal","L8"), {className:'station'})
-
-    Waypoints.mtOnk = L.marker([-4657, 1986], {icon:station}).bindPopup(popupStation("CR","Mt. Onk","R12"), {className:'station'})
-
-    Waypoints.OakRidge = L.marker([4519, 2095], {icon:station}).bindPopup(popupStation("CR","Oakridge","R14"), {className:'station'})
-
-    Waypoints.Cheeseland = L.marker([-4682, 2201], {icon:station}).bindPopup(popupStation("CR","Cheeseland","R14"), {className:'station'})
-
-    Waypoints.HighlandEast = L.marker([-2434, 2228], {icon:station}).bindPopup(popupStation("CR","Highland East","R11"), {className:'station'})
-
-    Waypoints.NorthernShores = L.marker([-1674, 2181], {icon:station}).bindPopup(popupStation("CR","Northern Shores","L22"), {className:'station'})
-
-    Waypoints.GrimsbyHarbor = L.marker([-4085, 2032], {icon:station}).bindPopup(popupStation("CR","Grimsby Harbor","R13, R12"), {className:'station'})
-
-
+    fetch(url)
+    .then(response => response.json())
+    .then(data => {
+        console.log('Obtained waypoint data:', data);
+        const rows = data.values;
+        rows.forEach(row => {
+            createWaypoint(row[0], row[1], row[2], row[3], row[4]);
+        });
+    })
+    .catch(error => {
+        console.error('Error while obtaining waypoint data:', error);
+    });
 
     // ZONES //
 
@@ -714,113 +676,6 @@ document.addEventListener('DOMContentLoaded', function() {
         Shoreden
     ]
 
-    var stations = [
-        Waypoints.Central, 
-        Waypoints.JungletownTemple,
-        Waypoints.LyciaBridge, 
-        Waypoints.Communista,
-        Waypoints.Grimsbypeaks,
-        Waypoints.NeoArcania,
-        Waypoints.Krunkeria,
-        Waypoints.NewIndustria,
-        Waypoints.StaraWies,
-        Waypoints.Riverant,
-        Waypoints.Capitalistopia,
-        Waypoints.Dragonstone,
-        Waypoints.Rublenika,
-        Waypoints.Blossomingvalley,
-        Waypoints.Cherryville,
-        Waypoints.Refinery,
-        Waypoints.FortBoreas,
-        Waypoints.Hammerington,
-        Waypoints.LyciaNewport,
-        Waypoints.WompWomp,
-        Waypoints.LycentPlateau,
-        Waypoints.IsleofWheat,
-        Waypoints.Timberland,
-        Waypoints.MiddleseaBeach,
-        Waypoints.SouthernCross,
-        Waypoints.Birchland,
-        Waypoints.PortAndesworth,
-        Waypoints.JungletownIndustrial,
-        Waypoints.Atombeach,
-        Waypoints.OldIndustria,
-        Waypoints.Rybnik,
-        Waypoints.EndPortal,
-        Waypoints.mtOnk,
-        Waypoints.OakRidge,
-        Waypoints.Cheeseland,
-        Waypoints.HighlandEast,
-        Waypoints.NorthernShores,
-        Waypoints.GrimsbyHarbor
-    ]
-
-    var bigStations = [
-        Waypoints.Central,
-        Waypoints.LyciaBridge,
-        Waypoints.JungletownTemple,
-        Waypoints.Communista,
-        Waypoints.Grimsbypeaks,
-        Waypoints.NeoArcania,
-        Waypoints.Krunkeria,
-        Waypoints.NewIndustria,
-        Waypoints.StaraWies,
-        Waypoints.Riverant,
-        Waypoints.Capitalistopia,
-        Waypoints.Dragonstone,
-        Waypoints.Rublenika
-    ]
-
-    var smallStations = [
-        Waypoints.Blossomingvalley,
-        Waypoints.Cherryville,
-        Waypoints.Refinery,
-        Waypoints.FortBoreas,
-        Waypoints.Hammerington,
-        Waypoints.LyciaNewport,
-        Waypoints.WompWomp,
-        Waypoints.LycentPlateau,
-        Waypoints.IsleofWheat,
-        Waypoints.Timberland,
-        Waypoints.MiddleseaBeach,
-        Waypoints.SouthernCross,
-        Waypoints.Birchland,
-        Waypoints.PortAndesworth,
-        Waypoints.JungletownIndustrial,
-        Waypoints.Atombeach,
-        Waypoints.OldIndustria,
-        Waypoints.Rybnik,
-        Waypoints.EndPortal,
-        Waypoints.mtOnk,
-        Waypoints.OakRidge,
-        Waypoints.Cheeseland,
-        Waypoints.HighlandEast,
-        Waypoints.NorthernShores,
-        Waypoints.GrimsbyHarbor
-    ]
-
-    var memorials = [
-        Waypoints.L6Statue,
-        Waypoints.WompChurch
-    ]
-
-    var bases = [
-        Waypoints.Mills
-    ]
-
-    var oceans = [
-        Waypoints.LukewarmBay,
-        Waypoints.lakeLycia
-    ]
-
-    var others = [
-        
-    ]
-
-    var terrains = [
-        Waypoints.TellusIsland
-    ]
-
     // please dont edit groups below, edit arrays abowe instead!
 
     var stationsGroup = L.layerGroup(stations);
@@ -837,6 +692,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     var terrainsGroup = L.layerGroup(terrains);
 
+    var visualsGroup = L.layerGroup(visuals);
+
     var Groups = [
         { group: stationsGroup, name: 'stations' },
         { group: regionsGroup, name: 'regions' },
@@ -844,7 +701,8 @@ document.addEventListener('DOMContentLoaded', function() {
         { group: basesGroup, name: 'bases' },
         { group: oceansGroup, name: 'oceans' },
         { group: othersGroup, name: 'others' },
-        { group: terrainsGroup, name: 'terrains' }
+        { group: terrainsGroup, name: 'terrains' },
+        { group: visualsGroup, name: 'Visual. ads'}
     ];
 
     var map = L.map('map', {
@@ -866,6 +724,7 @@ document.addEventListener('DOMContentLoaded', function() {
         "Bases/Towns": basesGroup,
         "Bays/Lakes": oceansGroup,
         "Terrain": terrainsGroup,
+        "Visual. ads": visualsGroup,
         "Other": othersGroup
     };
 
@@ -902,32 +761,23 @@ document.addEventListener('DOMContentLoaded', function() {
 
     map.on('zoomend', function() {
         var zoomLevel = map.getZoom();
-
-        var reallySmallStationIcon = L.icon({
-            iconUrl: './waypoints/station_small.png',
-            iconSize: [12, 12], 
-            iconAnchor: [6, 6],
-            popupAnchor: [0, 40]
-        });
         
         if (zoomLevel < 1) {
-            stations.forEach(waypoint => waypoint.setIcon(stationSmall));
-            memorials.forEach(waypoint => waypoint.setIcon(memorialSmall));
-            bases.forEach(waypoint => waypoint.setIcon(baseSmall));
-            oceans.forEach(waypoint => waypoint.setIcon(oceanSmall));
-            terrains.forEach(waypoint => waypoint.setIcon(terrainSmall));
-            others.forEach(waypoint => waypoint.setIcon(otherSmall));
-
-            smallStations.forEach(waypoint => waypoint.setIcon(reallySmallStationIcon));
+            stations.forEach(waypoint => waypoint.setIcon(Icons.stationSmall));
+            memorials.forEach(waypoint => waypoint.setIcon(Icons.memorialSmall));
+            bases.forEach(waypoint => waypoint.setIcon(Icons.baseSmall));
+            oceans.forEach(waypoint => waypoint.setIcon(Icons.oceanSmall));
+            terrains.forEach(waypoint => waypoint.setIcon(Icons.terrainSmall));
+            visuals.forEach(waypoint => waypoint.setIcon(Icons.visualSmall));
+            others.forEach(waypoint => waypoint.setIcon(Icons.otherSmall));
         } else {
-            stations.forEach(waypoint => waypoint.setIcon(station));
-            memorials.forEach(waypoint => waypoint.setIcon(memorial));
-            bases.forEach(waypoint => waypoint.setIcon(base));
-            oceans.forEach(waypoint => waypoint.setIcon(ocean));
-            others.forEach(waypoint => waypoint.setIcon(other));
-            terrains.forEach(waypoint => waypoint.setIcon(terrain));
-
-            smallStations.forEach(waypoint => waypoint.setIcon(station));
+            stations.forEach(waypoint => waypoint.setIcon(Icons.station));
+            memorials.forEach(waypoint => waypoint.setIcon(Icons.memorial));
+            bases.forEach(waypoint => waypoint.setIcon(Icons.base));
+            oceans.forEach(waypoint => waypoint.setIcon(Icons.ocean));
+            terrains.forEach(waypoint => waypoint.setIcon(Icons.terrain));
+            visuals.forEach(waypoint => waypoint.setIcon(Icons.visual));
+            others.forEach(waypoint => waypoint.setIcon(Icons.other));
         };
 
         saveMapBounds()
@@ -937,10 +787,8 @@ document.addEventListener('DOMContentLoaded', function() {
         saveMapBounds()
     });
 
-    var popup = L.popup();
-
     map.on('click', function(e) {
-        popup
+        L.popup()
             .setLatLng(e.latlng)
             .setContent(e.latlng.toString())
             .openOn(map)
