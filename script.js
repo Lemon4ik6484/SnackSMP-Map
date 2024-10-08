@@ -763,21 +763,21 @@ document.addEventListener('DOMContentLoaded', function() {
         var zoomLevel = map.getZoom();
         
         if (zoomLevel < 1) {
-            stations.forEach(waypoint => waypoint.setIcon(Icons.stationSmall));
-            memorials.forEach(waypoint => waypoint.setIcon(Icons.memorialSmall));
-            bases.forEach(waypoint => waypoint.setIcon(Icons.baseSmall));
-            oceans.forEach(waypoint => waypoint.setIcon(Icons.oceanSmall));
-            terrains.forEach(waypoint => waypoint.setIcon(Icons.terrainSmall));
-            visuals.forEach(waypoint => waypoint.setIcon(Icons.visualSmall));
-            others.forEach(waypoint => waypoint.setIcon(Icons.otherSmall));
+            stations?.forEach(waypoint => waypoint.setIcon(Icons.stationSmall));
+            memorials?.forEach(waypoint => waypoint.setIcon(Icons.memorialSmall));
+            bases?.forEach(waypoint => waypoint.setIcon(Icons.baseSmall));
+            oceans?.forEach(waypoint => waypoint.setIcon(Icons.oceanSmall));
+            terrains?.forEach(waypoint => waypoint.setIcon(Icons.terrainSmall));
+            visuals?.forEach(waypoint => waypoint.setIcon(Icons.visualSmall));
+            others?.forEach(waypoint => waypoint.setIcon(Icons.otherSmall));
         } else {
-            stations.forEach(waypoint => waypoint.setIcon(Icons.station));
-            memorials.forEach(waypoint => waypoint.setIcon(Icons.memorial));
-            bases.forEach(waypoint => waypoint.setIcon(Icons.base));
-            oceans.forEach(waypoint => waypoint.setIcon(Icons.ocean));
-            terrains.forEach(waypoint => waypoint.setIcon(Icons.terrain));
-            visuals.forEach(waypoint => waypoint.setIcon(Icons.visual));
-            others.forEach(waypoint => waypoint.setIcon(Icons.other));
+            stations?.forEach(waypoint => waypoint.setIcon(Icons.station));
+            memorials?.forEach(waypoint => waypoint.setIcon(Icons.memorial));
+            bases?.forEach(waypoint => waypoint.setIcon(Icons.base));
+            oceans?.forEach(waypoint => waypoint.setIcon(Icons.ocean));
+            terrains?.forEach(waypoint => waypoint.setIcon(Icons.terrain));
+            visuals?.forEach(waypoint => waypoint.setIcon(Icons.visual));
+            others?.forEach(waypoint => waypoint.setIcon(Icons.other));
         };
 
         saveMapBounds()
