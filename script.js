@@ -192,7 +192,7 @@ document.addEventListener('DOMContentLoaded', function() {
     var terrains = []
     var visuals = []
 
-    function createPopup(Name, Type, Text) {
+    function createPopup(Name, Type, Text, X, Y) {
         if (Type === "station") {
             return `<div class='horizontal'>
                         <img class='wp-logo' style='height: 20px;' src='./logos/CR.png'/>
@@ -201,7 +201,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div class='horizontal'>
                         <p class='wp-text gray'>Lines: </p>
                         <p class='wp-text'>` + Text + `</p>
-                    </div>`
+                    </div>
+                    <p class='wp-text gray'>XZ: ${X} ${Y}</p>`
         } else {
             return `<div class='horizontal'>
                         <img class='wp-logo' style='height: 20px;' src='./waypoints/${Type}.png'/>
@@ -209,14 +210,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                     <div class='horizontal'>
                         <p class='wp-text'>` + Text + `</p>
-                    </div>`
+                    </div>
+                    <p class='wp-text gray'>XZ: ${X} ${Y}</p>`
         }
     }
 
     function createWaypoint(name, X, Y, type, text) {
         let id = name + type
 
-        Waypoints[id] = L.marker([X, Y], {icon: Icons[type]}).bindPopup(createPopup(name, type, text), {className:type});
+        Waypoints[id] = L.marker([X, Y], {icon: Icons[type]}).bindPopup(createPopup(name, type, text, X, Y), {className:type});
         Waypoints[id].addTo(map);
 
         switch (type) {
