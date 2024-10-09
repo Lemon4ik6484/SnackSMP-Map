@@ -34,6 +34,7 @@
 .horizontal {
     display: flex;
     justify-content: center;
+    flex-direction: row;
 }
 
 /* STATION STYLE */
@@ -59,23 +60,6 @@
 
 .station .leaflet-popup-tip {
     display: none;
-}
-
-.station-title {
-    margin: 0 !important;
-    font-family: "Noto Sans", sans-serif;
-    font-weight: 700;
-    font-size: large;
-}
-
-.station-lines {
-    font-family: "Noto Sans", sans-serif;
-    margin: 0 !important;
-}
-
-.station-logo {
-    margin: 4px;
-    margin-top: 1px;
 }
 
 /* MEMORIAL STYLE */
@@ -228,6 +212,25 @@
     display: none;
 }
 
+/* WAYPOINT POPUP */
+
+.wp-title {
+    margin: 0 !important;
+    font-family: "Noto Sans", sans-serif;
+    font-weight: 700;
+    font-size: large;
+}
+
+.wp-text {
+    font-family: "Noto Sans", sans-serif;
+    margin: 0 !important;
+}
+
+.wp-logo {
+    margin: 4px;
+    margin-top: 1px;
+}
+
 /* ------ */
 
 .leaflet-popup-content {
@@ -237,6 +240,7 @@
     flex-direction: column !important;
     font-family: "Noto Sans", sans-serif;
     font-weight: 600;
+    white-space: nowrap;
 }
 
 .leaflet-tile {

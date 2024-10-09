@@ -192,43 +192,54 @@ document.addEventListener('DOMContentLoaded', function() {
     var terrains = []
     var visuals = []
 
-    function popupStation(Name, Lines) {
-        return "<div class='horizontal'><img class='station-logo' style='height: 20px;' src='" + "./logos/CR.png" + "'/><p class='station-title'>" + Name + "</p></div><div class='horizontal'><p class='station-lines gray'>Lines: </p><p class='station-lines'>" + Lines + "</p></div>"
+    function createPopup(Name, Type, Text) {
+        if (Type === "station") {
+            return `<div class='horizontal'>
+                        <img class='wp-logo' style='height: 20px;' src='./logos/CR.png'/>
+                        <p class='wp-title'>` + Name + `</p>
+                    </div>
+                    <div class='horizontal'>
+                        <p class='wp-text gray'>Lines: </p>
+                        <p class='wp-text'>` + Text + `</p>
+                    </div>`
+        } else {
+            return `<div class='horizontal'>
+                        <img class='wp-logo' style='height: 20px;' src='./waypoints/${Type}.png'/>
+                        <p class='wp-title'>` + Name + `</p>
+                    </div>
+                    <div class='horizontal'>
+                        <p class='wp-text'>` + Text + `</p>
+                    </div>`
+        }
     }
 
     function createWaypoint(name, X, Y, type, text) {
-        if (type === "station") {
-            let parts = text.match(/"([^"]+)"/g);
-            let stationName = parts[0].replace(/"/g, '');
-            let stationLines = parts[1].replace(/"/g, '');
-            Waypoints[name] = L.marker([X, Y], {icon: Icons[type]}).bindPopup(popupStation(stationName, stationLines), {className:type});
-        } else {
-            Waypoints[name] = L.marker([X, Y], {icon: Icons[type]}).bindPopup(text, {className:type});
-        }
+        let id = name + type
 
-        Waypoints[name].addTo(map);
+        Waypoints[id] = L.marker([X, Y], {icon: Icons[type]}).bindPopup(createPopup(name, type, text), {className:type});
+        Waypoints[id].addTo(map);
 
         switch (type) {
             case "station":
-                stations.push(Waypoints[name]);
+                stations.push(Waypoints[id]);
                 break
             case "memorial":
-                memorials.push(Waypoints[name]);
+                memorials.push(Waypoints[id]);
                 break
             case "ocean":
-                oceans.push(Waypoints[name]);
+                oceans.push(Waypoints[id]);
                 break
             case "base":
-                bases.push(Waypoints[name]);
+                bases.push(Waypoints[id]);
                 break
             case "other":
-                others.push(Waypoints[name]);
+                others.push(Waypoints[id]);
                 break
             case "terrain":
-                terrains.push(Waypoints[name]);
+                terrains.push(Waypoints[id]);
                 break
             case "visual":
-                visuals.push(Waypoints[name]);
+                visuals.push(Waypoints[id]);
                 break
         }
     }
