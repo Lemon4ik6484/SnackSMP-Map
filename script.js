@@ -193,26 +193,15 @@ document.addEventListener('DOMContentLoaded', function() {
     var visuals = []
 
     function createPopup(Name, Type, Text, X, Y) {
-        if (Type === "station") {
-            return `<div class='horizontal'>
-                        <img class='wp-logo' style='height: 20px;' src='./logos/CR.png'/>
-                        <p class='wp-title'>` + Name + `</p>
-                    </div>
-                    <div class='horizontal'>
-                        <p class='wp-text gray'>Lines: </p>
-                        <p class='wp-text'>` + Text + `</p>
-                    </div>
-                    <p class='wp-text gray'>XZ: ${X} ${Y}</p>`
-        } else {
-            return `<div class='horizontal'>
-                        <img class='wp-logo' style='height: 20px;' src='./waypoints/${Type}.png'/>
-                        <p class='wp-title'>` + Name + `</p>
-                    </div>
-                    <div class='horizontal'>
-                        <p class='wp-text'>` + Text + `</p>
-                    </div>
-                    <p class='wp-text gray'>XZ: ${X} ${Y}</p>`
-        }
+        return `<div class='horizontal'>
+                    <img class='wp-logo' style='height: 20px;' src='${Type === "station" ? "./CR.png" : "./waypoints/" + Type + ".png"}'/>
+                    <p class='wp-title'>` + Name + `</p>
+                </div>
+                <div class='horizontal'>
+                    ${Type === "station" ? "<p class='wp-text gray'>Lines: </p>" : ""}
+                    ${Text ? "<p class='wp-text'>" + Text + "</p>" : ""}
+                </div>
+                <p class='wp-text gray'>XY: ${X} ${Y}</p>`
     }
 
     function createWaypoint(name, X, Y, type, text) {
@@ -248,7 +237,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const API_KEY = 'AIzaSyC7opujheDheDJagCtkg9PGJNNariKwWrE';
     const SPREADSHEET_ID = '1nLXyOXjPCIKNd-l3v9IQRRu6sXxzoIuXLpyBdMQugIY';
-    const RANGE = 'Waypoints!B2:F150';
+    const RANGE = 'Waypoints!B2:F500';
 
     const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${RANGE}?key=${API_KEY}`;
 
@@ -260,6 +249,17 @@ document.addEventListener('DOMContentLoaded', function() {
         rows?.forEach(row => {
             createWaypoint(row[0], row[1], row[2], row[3], row[4]);
         });
+
+        var WaypointParam = getQueryParam('waypoint');
+        if (WaypointParam) {
+            var Coords = Waypoints[WaypointParam].getLatLng();
+            map.setView([Coords.lat, Coords.lng], 2);
+            mapRedraw();
+            Waypoints[WaypointParam].openPopup();
+        } else {
+            loadMapBounds()
+            loadLayers()
+        }
     })
     .catch(error => {
         console.error('Error while obtaining waypoint data:', error);
@@ -742,17 +742,6 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 
     var layerControl = L.control.layers(Maps, WaypointTypes).addTo(map);
-
-    var WaypointParam = getQueryParam('waypoint');
-    if (WaypointParam) {
-        var Coords = Waypoints[WaypointParam].getLatLng();
-        map.setView([Coords.lat, Coords.lng], 2);
-        mapRedraw();
-        Waypoints[WaypointParam].openPopup();
-    } else {
-        loadMapBounds()
-        loadLayers()
-    }
 
     // EVENTS/FUNCTIONS //
 
