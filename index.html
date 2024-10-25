@@ -4,8 +4,12 @@
     <title>SnackSMP Map</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="./style.css" />
+
+    <!--Leflet-->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="./script.js"></script>
+    
+    <script src="./libraries/proj4.js"></script>
+    <script src="./libraries/proj4leaflet.js"></script>
 
     <!--Google Fonts Connect-->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -22,8 +26,11 @@
     <meta property="og:url" content="https://lemon4ik6484.github.io/SnackSMP-Map/"/>
     <meta property="og:image" content="https://lemon4ik6484.github.io/SnackSMP-Map/preview.png?v=2"/>
     <meta content="#D3FFCE" data-react-helmet="true" name="theme-color"/>
+
+    <script src="./script.js"></script>
 </head>
 <body>
     <div id="map"></div>
+    <div id="coords">Coordinates: </div>
 </body>
 </html>

@@ -7,6 +7,21 @@
     background-color: black;
 }
 
+#coords{
+    position: absolute;
+    left: 0px;
+    bottom: 0px;
+    font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+    font-size: 12px;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding-left: 5px;
+    padding-right: 5px;
+    padding-top: 2px;
+    height: 16.8px;
+    line-height: 1.4;
+    font-weight: 500;
+}
+
 .fade-out {
     opacity: 0;
     transition: opacity 0.25s ease-in-out;
