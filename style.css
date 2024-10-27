@@ -77,6 +77,12 @@
     display: none;
 }
 
+.station {
+    stroke: #363b66;
+    fill: #454c84;
+    fill-opacity: 0.1;
+}
+
 /* MEMORIAL STYLE */
 
 .memorial .leaflet-popup-content-wrapper{
@@ -100,6 +106,12 @@
 
 .memorial .leaflet-popup-tip {
     display: none;
+}
+
+.memorial {
+    stroke: #bf6939;
+    fill: #d27f50;
+    fill-opacity: 0.1;
 }
 
 /* BASE STYLE */
@@ -127,6 +139,12 @@
     display: none;
 }
 
+.base {
+    stroke: #36714d;
+    fill: #45845e;
+    fill-opacity: 0.1;
+}
+
 /* OCEAN STYLE */
 
 .ocean .leaflet-popup-content-wrapper{
@@ -150,6 +168,12 @@
 
 .ocean .leaflet-popup-tip {
     display: none;
+}
+
+.ocean {
+    stroke: #395474;
+    fill: #456284;
+    fill-opacity: 0.1;
 }
 
 /* OTHER STYLE */
@@ -177,6 +201,12 @@
     display: none;
 }
 
+.other {
+    stroke: #b05858;
+    fill: #cf7474;
+    fill-opacity: 0.1;
+}
+
 /* TERRAIN STYLE */
 
 .terrain .leaflet-popup-content-wrapper{
@@ -202,6 +232,12 @@
     display: none;
 }
 
+.terrain {
+    stroke: #1e9b50;
+    fill: #3aba6d;
+    fill-opacity: 0.1;
+}
+
 /* VISUAL STYLE */
 
 .visual .leaflet-popup-content-wrapper{
@@ -225,6 +261,12 @@
 
 .visual .leaflet-popup-tip {
     display: none;
+}
+
+.visual {
+    stroke: #252c41;
+    fill: #2e395a;
+    fill-opacity: 0.1;
 }
 
 /* WAYPOINT POPUP */

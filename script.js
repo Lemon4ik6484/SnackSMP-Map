@@ -277,9 +277,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
             let polygon;
             if (markerType === 'polygon') {
-                polygon = L.polygon(coordinates).bindPopup(createPopup(name, type, text), { className: type });
+                polygon = L.polygon(coordinates, {className: type}).bindPopup(createPopup(name, type, text), { className: type });
             } else {
-                polygon = L.polyline(coordinates).bindPopup(createPopup(name, type, text), { className: type });
+                polygon = L.polyline(coordinates, {className: type}).bindPopup(createPopup(name, type, text), { className: type });
             }
 
             polygon.id = layerId;
