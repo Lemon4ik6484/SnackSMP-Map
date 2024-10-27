@@ -9,7 +9,7 @@ const trueWord = 'YasIamAllowedToUseThisSite'
 const API_KEY = 'AIzaSyC7opujheDheDJagCtkg9PGJNNariKwWrE';
 const SPREADSHEET_ID = '1nLXyOXjPCIKNd-l3v9IQRRu6sXxzoIuXLpyBdMQugIY';
 
-const GOOGLE_SHEETS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyeP7pJMw1PfBsOOuSeg6wuW2u_aNQZo3otkpMWo2YRiSlwny8vQYHjVfUxMeJ0opeP/exec';
+const GOOGLE_SHEETS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyHv61Lw4mBzxeJpjIY1X1J6yXysWpsDbJtkXPn0cVcMqs78fW5FisraGL1wtuJ3UgM5w/exec';
 
 const hashedTrueWord = CryptoJS.SHA256(trueWord);
 
@@ -186,7 +186,6 @@ document.addEventListener('DOMContentLoaded', function() {//
             body: JSON.stringify(payload)
         })
         .then(response => {
-            alert("Data sent!")
             console.info("Request sent: " + JSON.stringify(payload));
         })
         .catch(error => console.error("Error while sending data:", error));
@@ -202,9 +201,16 @@ document.addEventListener('DOMContentLoaded', function() {//
                 const type = row[1];
                 const name = row[2];
                 const text = row[3];
-                const coordinates = JSON.parse(row[4]);
+                const markerType = row[4];
+                const coordinates = JSON.parse(row[5]);
 
-                const polygon = L.polygon(coordinates).bindPopup(createPopup(name, type, text), { className: type });
+                let polygon;
+                if (markerType === 'polygon') {
+                    polygon = L.polygon(coordinates).bindPopup(createPopup(name, type, text), { className: type });
+                } else {
+                    polygon = L.polyline(coordinates).bindPopup(createPopup(name, type, text), { className: type });
+                }
+                
                 
                 polygon.id = layerId;
                 polygon.options.customAttributes = {
@@ -226,7 +232,7 @@ document.addEventListener('DOMContentLoaded', function() {//
             console.log('Obtained waypoint data:', data);
             const rows = data.values;
             rows?.forEach(row => {
-                if (row[0]) {
+                if (row != [] && row[0]) {
                     createWaypoint(row[0], row[1], row[2], row[3], row[4], row[7]);
                 }
             });
@@ -241,13 +247,20 @@ document.addEventListener('DOMContentLoaded', function() {//
         const layer = event.layer;
         regionsGroup.addLayer(layer);
 
+        let type;
         let coordinates = layer.getLatLngs();
-        let type = "polygon";
+        if (layer instanceof L.Polyline) {
+            type = "polyline";
+        } else {
+            type = "polygon";
+        }
 
         const layerId = new Date().getTime();
         layer.id = layerId;
 
         send(coordinates, 'create', layerId, type);
+        
+        alert("Data sent!")
     });
 
     map.on('draw:edited', function (event) {
@@ -266,6 +279,7 @@ document.addEventListener('DOMContentLoaded', function() {//
 
             send(coordinates, 'update', layerId, type);
         });
+        alert("Data sent!")
     });
 
     map.on('draw:deleted', function (event) {
@@ -277,6 +291,7 @@ document.addEventListener('DOMContentLoaded', function() {//
 
             send(null, 'delete', layerId, type);
         });
+        alert("Data sent!")
     });
 
     map.on('mousemove', function(e) {
@@ -284,7 +299,6 @@ document.addEventListener('DOMContentLoaded', function() {//
         document.getElementById('coords').innerText = `Coordinates: ${Math.floor(e.latlng["lng"]+0.5).toString() + " " + Math.floor((e.latlng["lat"]-0.5) * -1).toString()}`;
     });
 
-    debugger
     var param = getQueryParam('pass');
     if (param) {
         if (JSON.stringify(hashedTrueWord) === JSON.stringify(CryptoJS.SHA256(param))) {

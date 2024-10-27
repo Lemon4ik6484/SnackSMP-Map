@@ -211,16 +211,17 @@ document.addEventListener('DOMContentLoaded', function() {
     var terrains = []
     var visuals = []
 
-    function createPopup(Name, Type, Text, X, Y) {
+    function createPopup(Name, Type, Text, X=null, Y=null) {
         return `<div class='horizontal'>
-                    <img class='wp-logo' style='height: 20px;' src='${Type === "station" ? "./CR.png" : "./waypoints/" + Type + ".png"}'/>
+                    <img class='wp-logo' style='height: 20px;' src='${Type === "station" ? "../CR.png" : "../waypoints/" + Type + ".png"}'/>
                     <p class='wp-title'>` + Name + `</p>
                 </div>
                 <div class='horizontal'>
                     ${Type === "station" ? "<p class='wp-text gray'>Lines: </p>" : ""}
                     ${Text ? "<p class='wp-text'>" + Text + "</p>" : ""}
                 </div>
-                <p class='wp-text gray'>XY: ${X} ${Y}</p>`
+                ${X && Y ? `<p class='wp-text gray'>XY: ${X} ${Y}</p>` : ""}
+                `
     }
 
     function createWaypoint(name, X, Y, type, text) {
@@ -255,17 +256,54 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const API_KEY = 'AIzaSyC7opujheDheDJagCtkg9PGJNNariKwWrE';
     const SPREADSHEET_ID = '1nLXyOXjPCIKNd-l3v9IQRRu6sXxzoIuXLpyBdMQugIY';
-    const RANGE = 'Waypoints!B2:F500';
 
-    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${RANGE}?key=${API_KEY}`;
+    function getUrl(range) {
+        return `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${range}?key=${API_KEY}`
+    }
 
-    fetch(url)
+    var regions = []
+
+    fetch(getUrl("Polygons!A2:Z500"))
+    .then(response => response.json())
+    .then(data => {
+        const rows = data.values;
+        rows?.forEach(row => {
+            const layerId = row[0];
+            const type = row[1];
+            const name = row[2];
+            const text = row[3];
+            const markerType = row[4];
+            const coordinates = JSON.parse(row[5]);
+
+            let polygon;
+            if (markerType === 'polygon') {
+                polygon = L.polygon(coordinates).bindPopup(createPopup(name, type, text), { className: type });
+            } else {
+                polygon = L.polyline(coordinates).bindPopup(createPopup(name, type, text), { className: type });
+            }
+
+            polygon.id = layerId;
+            polygon.options.customAttributes = {
+                type: type,
+                name: name,
+                text: text
+            };
+
+            regions.push(polygon);
+            map.addLayer(polygon)
+        });
+    })
+    .catch(error => console.error("Error while obtaining polygon data:", error));
+    
+    fetch(getUrl("Waypoints!B2:F500"))
     .then(response => response.json())
     .then(data => {
         console.log('Obtained waypoint data:', data);
         const rows = data.values;
         rows?.forEach(row => {
-            createWaypoint(row[0], row[1], row[2], row[3], row[4]);
+            if (row != [] && row[0]) {
+                createWaypoint(row[0], row[1], row[2], row[3], row[4], row[7]);
+            }
         });
 
         var WaypointParam = getQueryParam('waypoint');
@@ -285,8 +323,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // LAYER CONTROL //
-
-    var regions = []
 
     var stationsGroup = L.layerGroup(stations);
 
