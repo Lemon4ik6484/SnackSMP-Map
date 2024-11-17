@@ -213,7 +213,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function createPopup(Name, Type, Text, X=null, Y=null) {
         return `<div class='horizontal'>
-                    <img class='wp-logo' style='height: 20px;' src='${Type === "station" ? "../CR.png" : "../waypoints/" + Type + ".png"}'/>
+                    <img class='wp-logo' style='height: 20px;' src='${Type === "station" ? "./CR.png" : "./waypoints/" + Type + ".png"}'/>
                     <p class='wp-title'>` + Name + `</p>
                 </div>
                 <div class='horizontal'>
