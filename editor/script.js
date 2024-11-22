@@ -9,7 +9,7 @@ const trueWord = 'YasIamAllowedToUseThisSite'
 const API_KEY = 'AIzaSyC7opujheDheDJagCtkg9PGJNNariKwWrE';
 const SPREADSHEET_ID = '1nLXyOXjPCIKNd-l3v9IQRRu6sXxzoIuXLpyBdMQugIY';
 
-const GOOGLE_SHEETS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyHv61Lw4mBzxeJpjIY1X1J6yXysWpsDbJtkXPn0cVcMqs78fW5FisraGL1wtuJ3UgM5w/exec';
+const GOOGLE_SHEETS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwghOD8yBYQfrj6sl-gufXtLpeNenTOCN3peLyd8Lx8h7TDnoJ8B7c1hTySy5CGscmv1w/exec';
 
 const hashedTrueWord = CryptoJS.SHA256(trueWord);
 
@@ -178,9 +178,10 @@ document.addEventListener('DOMContentLoaded', function() {//
         };
 
         fetch(GOOGLE_SHEETS_SCRIPT_URL, {
+            redirect: "follow",
             method: "POST",
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "text/plain;charset=utf-8"
             },
             mode: "no-cors",
             body: JSON.stringify(payload)
@@ -188,7 +189,8 @@ document.addEventListener('DOMContentLoaded', function() {//
         .then(response => {
             console.info("Request sent: " + JSON.stringify(payload));
             if (response) {
-                console.info("Response: " + response)
+                console.info("Status: " + response.status)
+                console.info("Responce: " + response.message)
             }
         })
         .catch(error => console.error("Error while sending data:", error));
